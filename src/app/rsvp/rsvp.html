@@ -10,7 +10,7 @@
       Чтобы мы могли с любовью подготовить этот день, пожалуйста, подтвердите ваше присутствие до&nbsp;30&nbsp;ноября 2026&nbsp;года.
     </p>
 
-    <button #trigger class="cta reveal" data-reveal type="button" (click)="openForm()">RSVP</button>
+    <button #trigger class="cta reveal" data-reveal type="button" (click)="openForm()">Анкета гостя</button>
   </div>
 
   @if (open()) {
@@ -115,7 +115,7 @@
               <circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="2" />
               <path d="M15 27l7 7 15-15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            <p class="done-text">Спасибо, {{ fullName() }}! Мы очень ждём встречи с вами.</p>
+            <p class="done-text">Спасибо, {{ fullName() }}! <br />Мы очень ждём встречи с Вами.</p>
           </div>
         }
       </div>

@@ -105,29 +105,6 @@
   margin-top: 0;
 }
 
-/* ================= the flowers ================= */
-
-.flower {
-  position: absolute;
-  width: clamp(150px, 46%, 300px);
-  height: auto;
-  pointer-events: none;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-.flower-tl {
-  top: -1%;
-  left: -4%;
-  transform-origin: 0 0;
-}
-
-.flower-br {
-  right: -4%;
-  bottom: -1%;
-  transform-origin: 100% 100%;
-}
-
 /* ================= entrance (when the section scrolls into view) ================= */
 
 .wall {
@@ -137,18 +114,6 @@
 .reveal {
   opacity: 0;
   transform: translateY(14px);
-}
-
-.flower {
-  opacity: 0;
-}
-
-.flower-tl {
-  transform: translate(-6%, -6%) scale(0.9) rotate(-2deg);
-}
-
-.flower-br {
-  transform: translate(6%, 6%) scale(0.9) rotate(2deg);
 }
 
 :host(.is-visible) .wall {
@@ -192,47 +157,11 @@
   transition-delay: 1.4s;
 }
 
-:host(.is-visible) .flower {
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity 0.9s ease 0.4s,
-    transform 1.4s cubic-bezier(0.18, 0.7, 0.2, 1) 0.4s;
-}
-
-:host(.is-visible) .flower-tl {
-  animation: sway-tl 9s ease-in-out 2.2s infinite alternate;
-}
-
-:host(.is-visible) .flower-br {
-  animation: sway-br 10s ease-in-out 2.2s infinite alternate;
-}
-
-@keyframes sway-tl {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(1.1deg) translateY(1px);
-  }
-}
-
-@keyframes sway-br {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(-1.1deg) translateY(-1px);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .wall,
   .reveal,
-  .flower,
   :host(.is-visible) .wall,
-  :host(.is-visible) .reveal,
-  :host(.is-visible) .flower {
+  :host(.is-visible) .reveal {
     opacity: 1;
     transform: none;
     transition: none;

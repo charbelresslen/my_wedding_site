@@ -12,8 +12,14 @@ import {
 
 const VIDEO_SRC = 'media/envelope.mp4';
 
-/** Length of the fade into the main page. It is timed to finish as the video ends. */
-const FADE_SECONDS = 1.4;
+/**
+ * Length of the fade into the main page. It is timed to finish as the video ends, and to START right as the
+ * envelope's own flaps begin to lift (about 2s before the end of envelope.mp4) - so the site's own photo, already
+ * sitting fully rendered underneath the whole time, starts bleeding through exactly as that light appears, instead
+ * of the flaps finishing their opening (revealing nothing but light - baked into the video itself) and only then
+ * cutting to the page. A longer fade also just reads as less abrupt than a quick 1.4s cut did.
+ */
+const FADE_SECONDS = 2;
 const FADE_SECONDS_REDUCED_MOTION = 0.4;
 /** Start slightly early so the overlay is fully transparent by the last frame. */
 const FADE_LEAD_SECONDS = 0.1;

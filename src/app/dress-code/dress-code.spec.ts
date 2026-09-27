@@ -40,7 +40,7 @@ describe('DressCode', () => {
       { name: 'Мокко', color: '#8d6752' },
       { name: 'Пудровый', color: '#cf9f9d' },
       { name: 'Чёрный', color: '#161312' },
-      { name: 'Молочный', color: '#fdf4eb' },
+      { name: 'Кремовый', color: 'var(--bg)' },
     ]);
   });
 
@@ -48,7 +48,7 @@ describe('DressCode', () => {
     const el: HTMLElement = create().nativeElement;
     const last = [...el.querySelectorAll<HTMLElement>('.dot')].pop()!;
     // --bg in src/styles.css
-    expect(last.style.getPropertyValue('--c')).toBe('#fdf4eb');
+    expect(last.style.getPropertyValue('--c')).toBe('var(--bg)');
   });
 
   it('names the palette in words for screen readers, and hides the circles themselves', () => {

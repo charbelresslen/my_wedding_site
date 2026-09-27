@@ -43,15 +43,13 @@ describe('GiftSection', () => {
     expect(joke).toContain('повезёт');
   });
 
-  it('writes on the wall, with a burgundy flower cluster on the top-left and one on the bottom-right corner', () => {
+  it('writes on the wall', () => {
     const el: HTMLElement = create().nativeElement;
     const src = (selector: string) => el.querySelector(selector)?.getAttribute('src');
 
     expect(src('.wall')).toBe('media/gift-wall.webp');
-    expect(src('.flower-tl')).toBe('media/gift-flower-tl.webp');
-    expect(src('.flower-br')).toBe('media/gift-flower-br.webp');
-    // the wall, the flowers, the divider and the envelope are decoration
-    for (const decoration of el.querySelectorAll('.wall, .flower, .divider, .envelope')) expect(decoration.getAttribute('aria-hidden')).toBe('true');
+    // the wall, the divider and the envelope are decoration
+    for (const decoration of el.querySelectorAll('.wall, .divider, .envelope')) expect(decoration.getAttribute('aria-hidden')).toBe('true');
     for (const img of el.querySelectorAll('img')) expect(img.getAttribute('alt')).toBe('');
   });
 

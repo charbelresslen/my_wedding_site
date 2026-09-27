@@ -72,7 +72,8 @@
   position: relative;
   z-index: 0;
   width: 84%;
-  margin-inline: auto;
+  /* shifted to the start (not centred): more of it shows past the smaller photo taped over its corner */
+  margin-inline: 0 auto;
   padding: 3.6% 3.6% 12%;
   transform: rotate(-2.5deg);
 }

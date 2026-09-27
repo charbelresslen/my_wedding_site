@@ -158,7 +158,7 @@ describe('Rsvp', () => {
     req.flush({ id: 42 }, { status: 201, statusText: 'Created' });
     fixture.detectChanges();
 
-    expect(say(el.querySelector('.done-text'))).toBe('Спасибо, Анна Петрова! Мы очень ждём встречи с вами.');
+    expect(say(el.querySelector('.done-text'))).toBe('Спасибо, Анна Петрова! Мы очень ждём встречи с Вами.');
   });
 
   it('shows a friendly Russian message, in Russian, when the server refuses the answer', () => {

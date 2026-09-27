@@ -17,7 +17,7 @@ const SHADES: Shade[] = [
   { name: 'Мокко', color: '#8d6752' },
   { name: 'Пудровый', color: '#cf9f9d' },
   { name: 'Чёрный', color: '#161312' },
-  { name: 'Молочный', color: '#fdf4eb' },
+  { name: 'Кремовый', color: 'var(--bg)' },
 ];
 
 /**
