@@ -1,2 +1,5 @@
 node_modules/
 .env
+
+# Generated guest-list exports (real names/choices - never belong in the repo)
+rsvp-export-*.xlsx

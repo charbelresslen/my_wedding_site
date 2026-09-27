@@ -5,11 +5,13 @@
   "description": "The small local API between the RSVP form and the MySQL database (see schema.sql and README.md).",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "export": "node export-rsvp.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "exceljs": "^4.4.0",
     "express": "^4.21.2",
     "mysql2": "^3.11.5"
   }
