@@ -12,11 +12,6 @@ import {
 
 const VIDEO_SRC = 'media/envelope.mp4';
 
-/** The sealed envelope stays on screen this long (counted from opening the site) before the video starts. */
-const AUTOPLAY_DELAY_MS = 800;
-/** If the tab was hidden when the delay ended, wait this long after it becomes visible. */
-const AUTOPLAY_RESUME_DELAY_MS = 800;
-
 /** Length of the fade into the main page. It is timed to finish as the video ends. */
 const FADE_SECONDS = 1.4;
 const FADE_SECONDS_REDUCED_MOTION = 0.4;
@@ -41,8 +36,8 @@ const POSTER_REMOVE_AFTER_MS = 300; // a little longer than the CSS dissolve
 const FIRST_FRAME_TIMEOUT_MS = 400;
 
 /**
- * - loading: the video file is being read into memory
- * - ready:   fully loaded, waiting for the autoplay delay (or a tap)
+ * - loading: the video's first frame is still buffering
+ * - ready:   a frame is ready; waiting for a tap
  * - playing: playing
  * - fading:  the last moments; overlay is fading out to the main page
  */
@@ -60,11 +55,15 @@ export class IntroVideo {
   readonly finished = output<void>();
   /** Emits when the video has faded to (almost) nothing, a little before `finished`. */
   readonly almostGone = output<void>();
+  /** Emits the instant the envelope is tapped, synchronously inside that click — before the video actually starts
+   *  playing. A parent can use this same real user gesture to unlock another media element's autoplay (see
+   *  `BackgroundMusic.unlockForGesture`), which cannot be done reliably from a later, gesture-less callback. */
+  readonly opened = output<void>();
 
   protected readonly phase = signal<Phase>('loading');
   /** True once frames have really played (changes the wording of the tap prompt: open vs continue). */
   protected readonly started = signal(false);
-  /** Autoplay was blocked (or the video was paused from outside): show the tap prompt. */
+  /** Whether to show the "tap to open" prompt: true once ready, and again if the video was paused from outside. */
   protected readonly needsTap = signal(false);
   /** The sealed-envelope image on top of the video; dissolved once the video is really showing frames. */
   protected readonly posterVisible = signal(true);
@@ -74,14 +73,8 @@ export class IntroVideo {
   private readonly videoRef = viewChild.required<ElementRef<HTMLVideoElement>>('video');
 
   private readonly abort = new AbortController();
-  private readonly openedAt = performance.now();
-  private objectUrl: string | undefined;
-  private autoplayTimer: ReturnType<typeof setTimeout> | undefined;
   private posterTimer: ReturnType<typeof setTimeout> | undefined;
   private almostGoneTimer: ReturnType<typeof setTimeout> | undefined;
-  /** Playing without sound because the browser refused autoplay with sound (until the first gesture). */
-  private silent = false;
-  private gestureListeners: AbortController | undefined;
   private watchingFrames = false;
   private frameHandle: number | undefined;
   private fadeAnimation: Animation | undefined;
@@ -100,34 +93,6 @@ export class IntroVideo {
   /** A tap anywhere on the overlay (also on the backdrop beside the video) opens the envelope if it is waiting. */
   protected onHostClick(): void {
     this.open();
-  }
-
-  /**
-   * Browsers refuse to start sound until the visitor has touched the page once, so when autoplay had to
-   * start silently, the FIRST real gesture anywhere (tap, click, key) switches the sound on. There is no
-   * button: nothing is drawn over the envelope. `pointerup`/`touchend`/`click`/`keydown` are the events
-   * browsers accept as a gesture for touch, mouse and keyboard (`pointerdown` does not count for touch).
-   */
-  private unmuteOnFirstGesture(): void {
-    this.gestureListeners?.abort();
-    const controller = (this.gestureListeners = new AbortController());
-    const onGesture = () => this.enableSound();
-    for (const type of ['pointerup', 'touchend', 'click', 'keydown'] as const) {
-      window.addEventListener(type, onGesture, { capture: true, passive: true, signal: controller.signal });
-    }
-  }
-
-  private enableSound(): void {
-    if (!this.silent) return;
-    // Modifier keys and the like are not gestures: unmuting without a real one would make Chrome pause the video.
-    if (navigator.userActivation && !navigator.userActivation.isActive) return;
-
-    this.silent = false;
-    this.gestureListeners?.abort();
-    const video = this.videoRef().nativeElement;
-    video.muted = false;
-    // Safety net: if a browser paused the video because of the unmute, resume it inside this same gesture.
-    if (video.paused && !video.ended) void video.play().catch(() => {});
   }
 
   /** The video is really rendering frames: begin watching its clock for the fade. */
@@ -212,43 +177,16 @@ export class IntroVideo {
 
   private async preload(): Promise<void> {
     const video = this.videoRef().nativeElement;
-
-    // Download the whole file up front (about 5 MB) and play it from memory, so playback can never
-    // stall on the network. If that fails for any reason, fall back to normal streaming.
-    try {
-      const response = await fetch(VIDEO_SRC, { signal: this.abort.signal });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const blob = await response.blob();
-      this.objectUrl = URL.createObjectURL(new Blob([blob], { type: 'video/mp4' }));
-      video.src = this.objectUrl;
-    } catch {
-      if (this.abort.signal.aborted) return;
-      video.src = VIDEO_SRC;
-    }
+    // `preload="auto"` on the element (see the template) streams the file progressively, so first-frame
+    // readiness only needs however much has buffered so far, not the whole ~1.6 MB file.
+    video.src = VIDEO_SRC;
 
     await this.firstFrame(video);
     if (this.abort.signal.aborted) return;
 
     this.phase.set('ready');
-
-    // Give the guest a moment with the sealed envelope, then open it by itself.
-    this.scheduleAutoplay(AUTOPLAY_DELAY_MS - (performance.now() - this.openedAt));
-  }
-
-  private scheduleAutoplay(delayMs: number): void {
-    clearTimeout(this.autoplayTimer);
-    this.autoplayTimer = setTimeout(() => {
-      if (this.abort.signal.aborted || this.phase() !== 'ready') return; // a tap already started it
-      if (document.visibilityState === 'hidden') {
-        // Nobody can see the envelope (background tab): wait until someone can, then a short beat.
-        document.addEventListener('visibilitychange', () => this.scheduleAutoplay(AUTOPLAY_RESUME_DELAY_MS), {
-          once: true,
-          signal: this.abort.signal,
-        });
-        return;
-      }
-      void this.autoplay();
-    }, Math.max(0, delayMs));
+    // Always require a tap now: it is also the one reliable place to start sound (see `play()`).
+    this.needsTap.set(true);
   }
 
   private firstFrame(video: HTMLVideoElement): Promise<void> {
@@ -265,45 +203,15 @@ export class IntroVideo {
   }
 
   /**
-   * Start without a tap. Browsers only allow that with sound in some cases, so: try with sound,
-   * then silently (always allowed), and if even that is refused (e.g. iOS Low Power Mode) show the
-   * tap prompt so the guest is never stuck.
+   * Playback started by a tap (with sound). This is the ONLY way the video ever starts — a real click is also
+   * the one reliable place to unlock another media element's autoplay (see `opened`), so it is emitted here,
+   * synchronously, before the (async) `video.play()` call.
    */
-  private async autoplay(): Promise<void> {
-    if (this.phase() !== 'ready') return; // a tap already started it
-    const video = this.videoRef().nativeElement;
-    this.phase.set('playing');
-
-    try {
-      await video.play();
-      return;
-    } catch {
-      if (this.abort.signal.aborted) return;
-    }
-
-    video.muted = true;
-    this.silent = true;
-    this.unmuteOnFirstGesture();
-    try {
-      await video.play();
-      return;
-    } catch {
-      if (this.abort.signal.aborted) return;
-    }
-
-    video.muted = false;
-    this.silent = false;
-    this.gestureListeners?.abort();
-    this.phase.set('ready');
-    this.needsTap.set(true);
-  }
-
-  /** Playback started by a tap (with sound). */
   private async play(): Promise<void> {
-    clearTimeout(this.autoplayTimer);
     const video = this.videoRef().nativeElement;
     this.needsTap.set(false);
     this.phase.set('playing');
+    this.opened.emit();
     try {
       await video.play();
     } catch {
@@ -320,18 +228,15 @@ export class IntroVideo {
 
   private teardown(): void {
     this.abort.abort();
-    clearTimeout(this.autoplayTimer);
     clearTimeout(this.posterTimer);
     clearTimeout(this.almostGoneTimer);
-    this.gestureListeners?.abort();
     this.fadeAnimation?.cancel();
 
     const video = this.videoRef().nativeElement;
     if (this.frameHandle !== undefined) video.cancelVideoFrameCallback?.(this.frameHandle);
-    // Release the decoder and the in-memory copy of the file.
+    // Release the decoder.
     video.pause();
     video.removeAttribute('src');
     video.load();
-    if (this.objectUrl) URL.revokeObjectURL(this.objectUrl);
   }
 }

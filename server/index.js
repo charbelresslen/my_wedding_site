@@ -41,10 +41,21 @@ app.use(
       } catch {
         /* an unparseable Origin header falls through to the rejection below */
       }
+      // Logged so a deployment where the site loads but the API rejects it (see DEPLOY-WINDOWS.md /
+      // DEPLOY.md) shows exactly which origin string is missing from ALLOWED_ORIGINS, instead of a
+      // silent rejection with no clue what to add.
+      console.warn(`CORS: rejected origin "${origin}" — add it to ALLOWED_ORIGINS in server/.env if this should be allowed`);
       callback(new Error('Not allowed by CORS'));
     },
   }),
 );
+
+// Turns a rejected CORS origin into a real JSON response (403) instead of Express's default HTML error page, so it
+// is distinguishable client-side from a network-unreachable failure (no response at all) or a database error (500).
+app.use((err, _req, res, next) => {
+  if (err && err.message === 'Not allowed by CORS') return res.status(403).json({ error: 'CORS_NOT_ALLOWED' });
+  next(err);
+});
 
 /** The menu, straight from the database, in the order it should be shown (edit the tables, not this file, to change it). */
 async function loadMenu() {

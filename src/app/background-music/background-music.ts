@@ -6,11 +6,14 @@ const VOLUME = 0.4;
 const MUTED_STORAGE_KEY = 'wedding-music-muted';
 
 /**
- * Step 12: the site's background music - "Ambient Piano" by AtlasAudio (Pixabay, free licence, see README). Starts
- * the moment the envelope has (almost) finished opening (the same signal that starts the page's own entrance) and
- * loops for as long as the guest stays on the page. Autoplay with sound is refused by some browsers until the
- * visitor has touched the page once, so it follows the exact same fallback as the envelope's own video (try with
- * sound, then silently, then switch the sound on at the very first tap/click/key) instead of ever getting stuck.
+ * Step 12: the site's background music - "Ambient Piano" by AtlasAudio (Pixabay, free licence, see README). The
+ * element is unlocked the instant the envelope is tapped (`unlockForGesture`, called from that same click, before
+ * this component's own `playing` input ever turns true - see `app.ts`), then actually starts audible once the
+ * envelope has (almost) finished opening (`playing` becomes true, `start()` below). Browsers refuse to start an
+ * element's sound without a real gesture, but do not require a fresh one just to mute/unmute an element that is
+ * already playing - which is exactly the gap between those two moments that `unlockForGesture` exists to bridge.
+ * `start()` also keeps its own try-with-sound / fall back to silent-then-first-gesture path as a defensive fallback,
+ * for the rare case `unlockForGesture` was never called (e.g. the `?nointro` debug flag skips the envelope entirely).
  * A small button is the only way to stop audio that starts on its own, which guests should always have; it is kept
  * out of that same "first gesture" listener (see `unmuteOnFirstGesture`), or a tap on it would both toggle the sound
  * itself AND be caught as "the guest's first gesture", undoing each other.
@@ -48,6 +51,22 @@ export class BackgroundMusic {
     inject(DestroyRef).onDestroy(() => this.gestureListeners?.abort());
   }
 
+  /**
+   * Called once, synchronously, from inside the envelope's own tap (see `IntroVideo.opened` / `app.html`) — the one
+   * reliable real user gesture on this page. Starts the element now, always muted regardless of the guest's stored
+   * preference: this call only exists to satisfy the browser's "a real gesture started this" requirement early,
+   * before the intro video has even finished. `start()` (below) decides the real audible state moments later, once
+   * the intro actually reveals the page — muting/unmuting an already-playing element needs no gesture of its own.
+   */
+  unlockForGesture(): void {
+    if (this.started) return;
+    this.started = true;
+    const audio = this.audioRef().nativeElement;
+    audio.volume = VOLUME;
+    audio.muted = true;
+    void safePlay(audio);
+  }
+
   /** The mute button. Also doubles as "play" if autoplay never managed to start anything at all. */
   protected toggleMuted(): void {
     this.silent = false; // an explicit choice replaces any "waiting for a gesture" auto-unmute
@@ -61,7 +80,15 @@ export class BackgroundMusic {
   }
 
   private async start(): Promise<void> {
-    if (this.started) return;
+    if (this.started) {
+      // Already playing (muted) since the envelope's tap called `unlockForGesture` — reveal sound now, unless the
+      // guest's own stored preference is to stay muted (nothing to do in that case; the button reflects it already).
+      if (this.muted()) return;
+      const audio = this.audioRef().nativeElement;
+      this.setMuted(audio, false);
+      if (audio.paused) void safePlay(audio);
+      return;
+    }
     this.started = true;
     const audio = this.audioRef().nativeElement;
     audio.volume = VOLUME;

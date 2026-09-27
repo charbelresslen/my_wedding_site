@@ -2,5 +2,5 @@
 <app-home [revealed]="revealed()" />
 <app-background-music [playing]="revealed()" />
 @if (!introDone()) {
-  <app-intro-video (almostGone)="reveal()" (finished)="finishIntro()" />
+  <app-intro-video (opened)="unlockAudio()" (almostGone)="reveal()" (finished)="finishIntro()" />
 }

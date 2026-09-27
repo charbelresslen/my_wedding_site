@@ -1,6 +1,11 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { timeout } from 'rxjs';
 import { revealParts } from '../shared/reveal-on-view';
+
+/** How long to wait for the menu before giving up and showing the error state — otherwise a firewalled or
+ *  unreachable API (see API_BASE below) leaves the guest looking at "Загружаем меню…" forever. */
+const MENU_TIMEOUT_MS = 8000;
 
 /**
  * The local API that serves the menu and saves each guest's answer (see `server/` next to this project: a small
@@ -162,16 +167,27 @@ export class Rsvp {
   protected fetchMenu(): void {
     this.menuLoading.set(true);
     this.menuError.set(false);
-    this.http.get<Menu>(`${API_BASE}/api/menu`).subscribe({
-      next: (menu) => {
-        this.menu.set(menu);
-        this.menuLoading.set(false);
-      },
-      error: () => {
-        this.menuLoading.set(false);
-        this.menuError.set(true);
-      },
-    });
+    this.http
+      .get<Menu>(`${API_BASE}/api/menu`)
+      .pipe(timeout(MENU_TIMEOUT_MS))
+      .subscribe({
+        next: (menu) => {
+          this.menu.set(menu);
+          this.menuLoading.set(false);
+        },
+        error: (err: unknown) => {
+          // Logged so a deployment where this silently fails (wrong ALLOWED_ORIGINS, a blocked port, mixed
+          // content over HTTPS - see DEPLOY-WINDOWS.md / DEPLOY.md) shows up as a concrete status/URL in the
+          // console instead of just "menu didn't load".
+          if (err instanceof HttpErrorResponse) {
+            console.error('Menu fetch failed:', err.status, err.url, err.message);
+          } else {
+            console.error('Menu fetch failed:', err);
+          }
+          this.menuLoading.set(false);
+          this.menuError.set(true);
+        },
+      });
   }
 
   protected submit(): void {

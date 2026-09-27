@@ -58,15 +58,17 @@
             </div>
           </fieldset>
 
+          @if (menuLoading()) {
+            <p class="hint">Загружаем меню…</p>
+          } @else if (menuError()) {
+            <p class="hint error">
+              Не удалось загрузить меню.
+              <button class="retry" type="button" (click)="fetchMenu()">Попробовать снова</button>
+            </p>
+          }
+
           @if (attendance() === 'both') {
-            @if (menuLoading()) {
-              <p class="hint">Загружаем меню…</p>
-            } @else if (menuError()) {
-              <p class="hint error">
-                Не удалось загрузить меню.
-                <button class="retry" type="button" (click)="fetchMenu()">Попробовать снова</button>
-              </p>
-            } @else if (menu(); as m) {
+            @if (menu(); as m) {
               <fieldset class="field">
                 <legend class="field-label">Ваш напиток</legend>
                 <div class="choices drinks">

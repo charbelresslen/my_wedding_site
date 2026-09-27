@@ -80,6 +80,23 @@ Guests reach it at `http://<the VM's public address>:4500` (find that address in
 (e.g. `ALLOWED_ORIGINS=http://203.0.113.7:4500`) — the automatic "allow my own Wi-Fi" rule only covers private
 addresses, and this one almost certainly is not one.
 
+**If the site loads but the menu inside RSVP does not (works on your own computer, not once it's on the VM), it is
+almost always one of these three things — in order of how often they turn out to be it:**
+
+1. **`ALLOWED_ORIGINS` doesn't exactly match what the guest's browser sends.** It must match character-for-character:
+   the right protocol (`http`, not `https`, unless you actually set up HTTPS), the site's own port (`:4500`, not the
+   API's `:3010`), and no trailing slash. `server/index.js` now logs the exact origin it rejected (see the API's log
+   file, set up in NSSM's **I/O** tab in step 5) — that line tells you exactly what to paste into `ALLOWED_ORIGINS`.
+2. **You edited `server\.env` after the API was already started.** NSSM's Node process only reads `.env` once, at
+   startup — a later edit does nothing until you restart it: `nssm restart WeddingRSVP`.
+3. **Port 3010 isn't actually reachable from outside the VM** (only 4500 was opened, or the cloud NSG has a rule for
+   one port but not the other). Check this from your own computer, before assuming it's `ALLOWED_ORIGINS`:
+   ```powershell
+   Test-NetConnection -ComputerName <the VM's public address> -Port 3010
+   ```
+   `TcpTestSucceeded: True` means the port is reachable and the problem is CORS (point 1); `False` means a firewall
+   somewhere is still blocking it — check both Windows' own rules (step 4) and, separately, the cloud host's NSG.
+
 ## The fuller way: IIS, one address, a real domain, HTTPS
 
 This mirrors DEPLOY.md's Linux recipe: the site and the API sit behind the *same* address, so there is no

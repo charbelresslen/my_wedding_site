@@ -97,7 +97,7 @@
   outline-offset: -8px;
 }
 
-/* Quiet caption between the seal and the lower flowers (only when needed: slow load, blocked autoplay). */
+/* Quiet caption between the seal and the lower flowers, prompting the tap that opens the envelope. */
 .caption {
   position: absolute;
   left: 0;

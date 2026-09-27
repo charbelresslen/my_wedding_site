@@ -1,4 +1,4 @@
-<audio #audio [src]="MUSIC_SRC" loop preload="auto"></audio>
+<audio #audio [src]="MUSIC_SRC" loop preload="none"></audio>
 
 @if (playing()) {
   <button #button class="toggle" type="button" [attr.aria-pressed]="!muted()" [attr.aria-label]="muted() ? 'Включить музыку' : 'Выключить музыку'" (click)="toggleMuted()">
