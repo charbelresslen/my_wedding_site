@@ -1,0 +1,51 @@
+<div class="frame">
+  <div class="box" [class.is-loading]="loading()">
+    @if (previewFailed()) {
+      <svg class="pin" viewBox="0 0 24 24" width="44" height="44" aria-hidden="true" focusable="false">
+        <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 1 1 13 0c0 5.4-6.5 11-6.5 11z" fill="currentColor" />
+        <circle cx="12" cy="10" r="2.4" fill="#efe7da" />
+      </svg>
+    } @else {
+      <img
+        class="preview"
+        [src]="preview()"
+        [alt]="mapTitle()"
+        width="615"
+        height="450"
+        loading="lazy"
+        decoding="async"
+        (error)="onPreviewError()"
+      />
+    }
+    @if (frameSrc(); as src) {
+      <iframe
+        class="map"
+        [class.is-shown]="shown()"
+        [src]="src"
+        [title]="mapTitle()"
+        referrerpolicy="no-referrer-when-downgrade"
+        (load)="onFrameLoad()"
+      ></iframe>
+    }
+
+    <!-- covers the map until it is tapped: a swipe over it scrolls the page, a tap on it makes the map movable -->
+    <button type="button" class="shield" [class.is-off]="engaged()" [attr.tabindex]="engaged() ? -1 : 0" aria-label="Двигать и приближать карту" (click)="activate()">
+      <span class="hint" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" focusable="false">
+          <path d="M12 3v18M3 12h18M12 3 9 6M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span>
+    </button>
+    <span class="spinner" aria-hidden="true"></span>
+  </div>
+
+  <img class="orn orn-top" src="media/loc-ornament.webp" width="1000" height="121" alt="" aria-hidden="true" decoding="async" loading="lazy" />
+  <img class="orn orn-bottom" src="media/loc-ornament.webp" width="1000" height="121" alt="" aria-hidden="true" decoding="async" loading="lazy" />
+</div>
+
+<a class="button" [href]="link()" target="_blank" rel="noopener noreferrer" [attr.aria-label]="buttonLabel()">
+  <span>Открыть в Яндекс Картах</span>
+  <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+    <path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+</a>

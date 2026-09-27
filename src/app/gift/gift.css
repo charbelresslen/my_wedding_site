@@ -1,0 +1,246 @@
+:host {
+  display: block;
+}
+
+.gift {
+  padding: clamp(24px, 6vw, 48px) 0 clamp(40px, 10vw, 72px);
+  overflow: clip;
+  color: var(--ink);
+}
+
+/*
+ * The stage is what the guest sees: the full width of the phone (never wider than 640px on a big screen). The wall is
+ * drawn a little wider than a narrow phone, so the panel the writing sits on is large enough to read; the extra at the
+ * sides is cropped by the section, which is as wide as the phone. The stage itself does not clip: on a big screen the
+ * flowers overhang its corners a little and must stay whole there. Sizes inside the card are fractions of the wall's
+ * width (container query units), so the writing stays inside its panel on every screen.
+ */
+.stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  width: min(100%, 640px);
+  margin-inline: auto;
+}
+
+.card {
+  position: relative;
+  width: max(100%, min(470px, 143%));
+  aspect-ratio: 941 / 1672;
+  container-type: inline-size;
+}
+
+.wall {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ================= the writing, on the big panel of the wall (x 166-771, y 264-1414 of the 941x1672 picture) ================= */
+
+.writing {
+  position: absolute;
+  left: 20%;
+  width: 60%;
+  top: 19%;
+  height: 61%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: 11.4cqw;
+  line-height: 1.05;
+}
+
+.divider {
+  display: block;
+  width: 21cqw;
+  height: auto;
+  margin: 1cqw 0 3.6cqw;
+  opacity: 0.85;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.text {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 3.6cqw;
+  line-height: 1.42;
+  text-wrap: balance;
+}
+
+.text + .text {
+  margin-top: 3.2cqw;
+}
+
+.lead {
+  font-size: 3.9cqw;
+}
+
+.envelope {
+  display: block;
+  width: 9cqw;
+  height: auto;
+  margin: 3.4cqw 0;
+  color: var(--ink);
+  opacity: 0.85;
+}
+
+.envelope + .text {
+  margin-top: 0;
+}
+
+/* ================= the flowers ================= */
+
+.flower {
+  position: absolute;
+  width: clamp(150px, 46%, 300px);
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.flower-tl {
+  top: -1%;
+  left: -4%;
+  transform-origin: 0 0;
+}
+
+.flower-br {
+  right: -4%;
+  bottom: -1%;
+  transform-origin: 100% 100%;
+}
+
+/* ================= entrance (when the section scrolls into view) ================= */
+
+.wall {
+  opacity: 0;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.flower {
+  opacity: 0;
+}
+
+.flower-tl {
+  transform: translate(-6%, -6%) scale(0.9) rotate(-2deg);
+}
+
+.flower-br {
+  transform: translate(6%, 6%) scale(0.9) rotate(2deg);
+}
+
+:host(.is-visible) .wall {
+  opacity: 1;
+  transition: opacity 1.2s ease;
+}
+
+:host(.is-visible) .reveal {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.8s ease,
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+:host(.is-visible) .divider {
+  opacity: 0.85;
+}
+
+:host(.is-visible) .title {
+  transition-delay: 0.4s;
+}
+
+:host(.is-visible) .divider {
+  transition-delay: 0.6s;
+}
+
+:host(.is-visible) .lead {
+  transition-delay: 0.8s;
+}
+
+:host(.is-visible) .lead + .text {
+  transition-delay: 1s;
+}
+
+:host(.is-visible) .envelope {
+  transition-delay: 1.2s;
+}
+
+:host(.is-visible) .envelope + .text {
+  transition-delay: 1.4s;
+}
+
+:host(.is-visible) .flower {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.9s ease 0.4s,
+    transform 1.4s cubic-bezier(0.18, 0.7, 0.2, 1) 0.4s;
+}
+
+:host(.is-visible) .flower-tl {
+  animation: sway-tl 9s ease-in-out 2.2s infinite alternate;
+}
+
+:host(.is-visible) .flower-br {
+  animation: sway-br 10s ease-in-out 2.2s infinite alternate;
+}
+
+@keyframes sway-tl {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(1.1deg) translateY(1px);
+  }
+}
+
+@keyframes sway-br {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-1.1deg) translateY(-1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wall,
+  .reveal,
+  .flower,
+  :host(.is-visible) .wall,
+  :host(.is-visible) .reveal,
+  :host(.is-visible) .flower {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+
+  .divider,
+  :host(.is-visible) .divider {
+    opacity: 0.85;
+  }
+}

@@ -1,0 +1,52 @@
+<div class="stage">
+  <video
+    #video
+    class="video"
+    preload="auto"
+    playsinline
+    disablepictureinpicture
+    disableremoteplayback
+    controlslist="nodownload noremoteplayback nofullscreen"
+    tabindex="-1"
+    aria-hidden="true"
+    (playing)="onPlaying()"
+    (pause)="onPause()"
+    (ended)="startFade()"
+    (error)="onError()"
+  ></video>
+
+  @if (posterVisible()) {
+    <!-- The sealed envelope (identical to the video's first frame). It stays ABOVE the video until the video has
+         really delivered frames, then dissolves, so no blank frame or brightness step can show at start-up. -->
+    <img
+      class="poster"
+      [class.poster-out]="posterFading()"
+      src="media/envelope-poster.jpg"
+      alt=""
+      width="720"
+      height="1280"
+      decoding="sync"
+      fetchpriority="high"
+      draggable="false"
+    />
+  }
+
+  @if (phase() === 'loading') {
+    <!-- Fades in only after a moment, so a fast load never flashes it. -->
+    <span class="caption wait" lang="ru" role="status">Загрузка…</span>
+  } @else if (phase() === 'ready') {
+    <!-- Invisible tap target: a tap during the short delay opens the envelope right away with sound.
+         The caption shows only if autoplay was blocked by the browser or the video was paused from outside. -->
+    <button
+      type="button"
+      class="tap"
+      lang="ru"
+      [attr.aria-label]="started() ? 'Продолжить' : 'Открыть приглашение'"
+      (click)="open()"
+    >
+      @if (needsTap()) {
+        <span class="caption hint">{{ started() ? 'Нажмите, чтобы продолжить' : 'Нажмите, чтобы открыть' }}</span>
+      }
+    </button>
+  }
+</div>

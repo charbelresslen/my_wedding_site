@@ -1,0 +1,270 @@
+:host {
+  display: block;
+}
+
+.timeline {
+  padding: clamp(40px, 11vw, 72px) 0 clamp(36px, 10vw, 64px);
+  overflow: clip;
+  color: var(--ink);
+}
+
+/* ================= heading ================= */
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(46px, 13vw, 66px);
+  line-height: 1.05;
+}
+
+.rule {
+  display: block;
+  width: min(58%, 290px);
+  height: auto;
+  margin: clamp(4px, 1.5vw, 10px) 0 clamp(20px, 6vw, 40px);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ================= the timeline ================= */
+
+.track {
+  --rail: clamp(48px, 14vw, 72px);
+  --flower: clamp(40px, 12vw, 58px);
+  /* the width the two finials are drawn at; the rod itself is a sixth of it */
+  --stick: clamp(28px, 8vw, 36px);
+
+  position: relative;
+  width: min(100%, 640px);
+  margin-inline: auto;
+  padding-inline: clamp(10px, 3.5vw, 24px);
+}
+
+/* the rail runs the whole height of the list; it is drawn from three pictures cut from the same columns */
+.rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: var(--stick);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.rail img {
+  position: absolute;
+  left: 0;
+  display: block;
+  width: 100%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.cap {
+  height: auto;
+}
+
+.cap-top {
+  top: 0;
+}
+
+.cap-bottom {
+  bottom: 0;
+}
+
+/* the plain rod fills what lies between the two finials (a uniform rod can be stretched without showing it) */
+.rod {
+  /* the two finials are 430/162 and 408/162 times the rail's width tall; overlap them by a pixel so no seam shows */
+  top: calc(var(--stick) * 2.654 - 1px);
+  height: calc(100% - var(--stick) * 5.173 + 2px);
+}
+
+.list {
+  position: relative;
+  display: grid;
+  row-gap: clamp(20px, 6vw, 36px);
+  margin: 0;
+  padding: clamp(52px, 15vw, 84px) 0;
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--rail) minmax(0, 1fr);
+  align-items: center;
+}
+
+.art {
+  grid-area: 1 / 1;
+  justify-self: center;
+  width: min(100%, 230px);
+}
+
+.art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.node {
+  grid-area: 1 / 2;
+  justify-self: center;
+  position: relative;
+  z-index: 1;
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid var(--ink);
+  background: var(--bg);
+  transform: rotate(45deg);
+}
+
+.info {
+  grid-area: 1 / 3;
+  padding-inline: 4px;
+  text-align: center;
+}
+
+/* every second step has its picture on the right and its writing on the left */
+.step-flip .art {
+  grid-area: 1 / 3;
+}
+
+.step-flip .info {
+  grid-area: 1 / 1;
+}
+
+.time {
+  margin: 0;
+  font-family: var(--font-script);
+  font-size: clamp(34px, 9.6vw, 46px);
+  line-height: 1.1;
+}
+
+.label {
+  margin: 2px auto 0;
+  max-width: 11em;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(15px, 4.2vw, 19px);
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+/* the flower: centred on the rail, its height is set from the script (transform only) */
+.flower {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 0;
+  width: var(--flower);
+  height: auto;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ================= entrance ================= */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.step .art {
+  opacity: 0;
+  transform: translateX(-18px) scale(0.96);
+}
+
+.step-flip .art {
+  transform: translateX(18px) scale(0.96);
+}
+
+.step .info {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.node {
+  opacity: 0;
+}
+
+.head.is-visible .reveal {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.8s ease,
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.head.is-visible .rule {
+  transition-delay: 0.15s;
+}
+
+.step.is-visible .art {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.9s ease,
+    transform 1s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.step.is-visible .info {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.8s ease 0.2s,
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s;
+}
+
+.step.is-visible .node {
+  opacity: 1;
+  transition: opacity 0.6s ease 0.1s;
+}
+
+:host(.is-visible) .flower {
+  opacity: 1;
+  transition: opacity 1s ease 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .step .art,
+  .step-flip .art,
+  .step .info,
+  .node,
+  .flower,
+  .head.is-visible .reveal,
+  .step.is-visible .art,
+  .step.is-visible .info,
+  .step.is-visible .node,
+  :host(.is-visible) .flower {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .flower,
+  :host(.is-visible) .flower {
+    /* keeps its centring; the script sets the height */
+    transform: translate(-50%, -50%);
+  }
+
+  .node,
+  .step.is-visible .node {
+    transform: rotate(45deg);
+  }
+}

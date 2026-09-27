@@ -1,0 +1,109 @@
+:host {
+  position: relative;
+  display: block;
+  padding: clamp(40px, 11vw, 64px) 20px clamp(64px, 18vw, 104px);
+  overflow: clip;
+  text-align: center;
+  color: var(--ink);
+}
+
+/* the same two flowers as the welcome section at the top of the page, here at the bottom corners as a bookend */
+.flower {
+  position: absolute;
+  bottom: 0;
+  z-index: 0;
+  width: clamp(64px, 20vw, 110px);
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.flower-left {
+  left: 0;
+  transform-origin: 0% 100%;
+}
+
+.flower-right {
+  right: 0;
+  transform-origin: 100% 100%;
+}
+
+.divider,
+.line,
+.made {
+  position: relative;
+  z-index: 1;
+}
+
+.divider {
+  display: block;
+  width: clamp(84px, 24vw, 116px);
+  height: auto;
+  margin: 0 auto clamp(20px, 5.5vw, 26px);
+  opacity: 0.75;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.line {
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(38px, 10.5vw, 50px);
+  line-height: 1.1;
+}
+
+.made {
+  margin: 10px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+
+/* ================= entrance (when it scrolls into view) ================= */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.flower-left {
+  transform: translate(-6%, 8%) scale(0.85);
+}
+
+.flower-right {
+  transform: translate(6%, 8%) scale(0.85);
+}
+
+:host(.is-visible) .reveal {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.9s ease,
+    transform 1s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+:host(.is-visible) .line {
+  transition-delay: 0.15s;
+}
+
+:host(.is-visible) .made {
+  transition-delay: 0.35s;
+}
+
+:host(.is-visible) .flower {
+  transition-delay: 0.2s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  :host(.is-visible) .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

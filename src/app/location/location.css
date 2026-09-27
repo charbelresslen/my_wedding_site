@@ -1,0 +1,200 @@
+:host {
+  display: block;
+}
+
+.place {
+  padding-bottom: clamp(64px, 18vw, 110px);
+  overflow: clip;
+  color: var(--ink);
+  text-align: center;
+}
+
+/* the column: the whole width of a phone, 560px at most on a big screen */
+.col {
+  width: min(100%, 560px);
+  margin-inline: auto;
+}
+
+/* ================= heading ================= */
+
+.head {
+  position: relative;
+  padding: clamp(56px, 17vw, 100px) 16px 0;
+}
+
+.title {
+  position: relative;
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(44px, 13.4vw, 72px);
+  line-height: 1.05;
+}
+
+.divider {
+  position: relative;
+  display: block;
+  width: clamp(96px, 29vw, 140px);
+  height: auto;
+  margin: 8px auto clamp(34px, 10vw, 54px);
+  opacity: 0.8;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* the big peony cluster at the top right of the section */
+.peony {
+  position: absolute;
+  top: 0;
+  right: -2%;
+  width: clamp(78px, 26vw, 150px);
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ================= a place ================= */
+
+.venue + .venue {
+  margin-top: clamp(64px, 18vw, 104px);
+}
+
+.who {
+  padding-inline: 20px;
+}
+
+/* the kind of place: the ceremony, the banquet */
+.role {
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(38px, 11vw, 50px);
+  line-height: 1.1;
+}
+
+/* the city in spaced capitals, the way "DUBAI" is set in the reference */
+.city {
+  margin: 6px 0 0;
+  /* the letter-spacing adds a gap after the last letter: pad the first side to keep the word centred */
+  padding-left: 0.4em;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(16px, 4.6vw, 19px);
+  letter-spacing: 0.4em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.name {
+  margin: 10px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(21px, 6vw, 26px);
+  line-height: 1.2;
+}
+
+.address {
+  margin: 4px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(18px, 5vw, 21px);
+  line-height: 1.25;
+  opacity: 0.9;
+}
+
+/* the photo: the whole width, melting into the page at the top and the bottom (and at the sides on a big screen) */
+.shot {
+  position: relative;
+  margin: clamp(22px, 6vw, 34px) 0 clamp(52px, 15vw, 68px);
+}
+
+.photo-wrap {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 84%, transparent 100%);
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (min-width: 561px) {
+  .photo-wrap {
+    -webkit-mask-image:
+      linear-gradient(to bottom, transparent 0, #000 12%, #000 84%, transparent 100%),
+      linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to bottom, transparent 0, #000 12%, #000 84%, transparent 100%),
+      linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
+    mask-composite: intersect;
+  }
+}
+
+/* the sprig of flowers on the bottom-left corner of the photo */
+.sprig {
+  position: absolute;
+  left: -1%;
+  bottom: -9%;
+  width: clamp(104px, 34%, 190px);
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ================= entrance (when a part scrolls into view) ================= */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.8s ease,
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.peony,
+.sprig {
+  opacity: 0;
+}
+
+.peony {
+  transform: translate(6%, -4%) scale(0.92);
+  transform-origin: 100% 0;
+}
+
+.sprig {
+  transform: translate(-6%, 6%) scale(0.9);
+  transform-origin: 0 100%;
+}
+
+.head.is-visible .peony,
+.shot.is-visible .sprig {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.9s ease 0.35s,
+    transform 1.3s cubic-bezier(0.18, 0.7, 0.2, 1) 0.35s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .peony,
+  .sprig,
+  .reveal.is-visible,
+  .head.is-visible .peony,
+  .shot.is-visible .sprig {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

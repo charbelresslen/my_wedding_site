@@ -1,0 +1,36 @@
+<section class="countdown" id="countdown" aria-labelledby="countdown-title">
+  <h2 class="title reveal" id="countdown-title">{{ finished() ? 'Торжество началось' : 'До начала торжества' }}</h2>
+
+  <img
+    class="divider reveal"
+    src="media/divider.webp"
+    width="1000"
+    height="147"
+    alt=""
+    aria-hidden="true"
+    decoding="async"
+    loading="lazy"
+  />
+
+  <div class="clock reveal" role="timer" [attr.aria-label]="spoken()">
+    @for (unit of units(); track unit.key; let last = $last) {
+      <div class="unit">
+        <div class="digits" aria-hidden="true">
+          @for (cell of unit.cells; track $index) {
+            <span class="cell">
+              @for (glyph of cell.glyphs; track glyph.id; let newest = $last) {
+                <span class="glyph" [class.enter]="newest && cell.glyphs.length > 1" [class.leave]="!newest"
+                  ><span class="ink">{{ glyph.char }}</span></span
+                >
+              }
+            </span>
+          }
+        </div>
+        <span class="label" aria-hidden="true">{{ unit.label }}</span>
+      </div>
+      @if (!last) {
+        <span class="colon" aria-hidden="true">:</span>
+      }
+    }
+  </div>
+</section>

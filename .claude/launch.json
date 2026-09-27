@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "wedding-site",
+      "runtimeExecutable": "npm.cmd",
+      "runtimeArgs": ["run", "start", "--", "--port", "4200"],
+      "port": 4200
+    },
+    {
+      "name": "wedding-site-prod",
+      "runtimeExecutable": "npm.cmd",
+      "runtimeArgs": ["run", "start", "--", "--configuration", "production", "--port", "4300"],
+      "port": 4300
+    }
+  ]
+}

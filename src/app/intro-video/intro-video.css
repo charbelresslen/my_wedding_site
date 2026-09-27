@@ -1,0 +1,155 @@
+/*
+ * Full-screen overlay. Its opacity is animated (compositor only) to reveal the main page underneath.
+ * `will-change` gives it its own layer up front so the fade doesn't hitch when it starts.
+ *
+ * The video is ALWAYS shown whole (never cropped): it is scaled to fit the overlay, keeping its 9:16 shape.
+ * The spare screen area (bands left/right on wide screens, above/below on tall phones) is one static colour.
+ */
+:host {
+  /* Backdrop behind the video (spare screen area). The video itself is never covered or faded. */
+  --backdrop: var(--paper);
+
+  /* Height of the 9:16 stage. Older browsers fall back to vh, then dvh, then the overlay's own size. */
+  --stage-h: min(100vh, 177.7778vw);
+
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--backdrop);
+  container-type: size;
+  touch-action: none;
+  overscroll-behavior: none;
+  will-change: opacity;
+}
+
+@supports (height: 100dvh) {
+  :host {
+    --stage-h: min(100dvh, 177.7778vw);
+  }
+}
+
+/* Container units track the overlay's real box, so the stage can never overflow the visible screen. */
+@supports (height: 1cqh) {
+  :host {
+    --stage-h: min(100cqh, 177.7778cqw);
+  }
+}
+
+/* Exactly the video's 9:16 shape, so the picture is never rescaled by object-fit. */
+.stage {
+  position: relative;
+  height: var(--stage-h);
+  width: calc(var(--stage-h) * 9 / 16);
+  container-type: size;
+}
+
+.video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Same box as the video, above it, until the video is really showing frames. */
+.poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  transition: opacity 0.2s linear;
+}
+
+.poster-out {
+  opacity: 0;
+}
+
+/* Invisible full-stage tap target. */
+.tap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.tap:focus-visible {
+  outline: 2px solid rgb(154 118 56 / 0.7);
+  outline-offset: -8px;
+}
+
+/* Quiet caption between the seal and the lower flowers (only when needed: slow load, blocked autoplay). */
+.caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 66%;
+  padding-inline: 6%;
+  text-align: center;
+  text-wrap: balance;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(11px, 3cqw, 18px);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  /* dark enough to read on the cream envelope (about 4.6:1) */
+  color: #7a5a24;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hint {
+  animation:
+    caption-in 0.6s ease both,
+    breathe 2.8s ease-in-out 0.6s infinite;
+}
+
+.wait {
+  animation: caption-wait 0.6s ease 1.2s both;
+}
+
+@keyframes caption-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes caption-wait {
+  to {
+    opacity: 0.85;
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint {
+    animation: caption-in 0.6s ease both;
+  }
+}

@@ -1,0 +1,21 @@
+@if (petals().length) {
+  <div class="shower" aria-hidden="true">
+    @for (p of petals(); track p.id) {
+      <span
+        class="drift"
+        [style.--x]="p.x + '%'"
+        [style.--o]="p.o"
+        [style.--fall]="p.fall + 's'"
+        [style.--delay]="p.delay + 's'"
+      >
+        <i
+          class="petal"
+          [style.--w]="p.w + 'px'"
+          [style.--amp]="p.amp + 'px'"
+          [style.--swayT]="p.swayT + 's'"
+          [style.--rot]="p.rot + 'deg'"
+        ></i>
+      </span>
+    }
+  </div>
+}

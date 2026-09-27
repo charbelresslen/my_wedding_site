@@ -1,0 +1,54 @@
+<section class="place" id="location" aria-labelledby="location-title">
+  <div class="col">
+    <header class="head reveal" data-reveal>
+      <h2 class="title" id="location-title">Локация</h2>
+      <img
+        class="divider"
+        src="media/divider.webp"
+        width="1000"
+        height="147"
+        alt=""
+        aria-hidden="true"
+        decoding="async"
+        loading="lazy"
+      />
+      <img class="peony" src="media/loc-peony.webp" width="277" height="400" alt="" aria-hidden="true" decoding="async" />
+    </header>
+
+    @for (venue of venues; track venue.id) {
+      <article class="venue" [attr.aria-labelledby]="'venue-' + venue.id">
+        <div class="who reveal" data-reveal>
+          <h3 class="role" [id]="'venue-' + venue.id">{{ venue.role }}</h3>
+          <p class="city">{{ venue.city }}</p>
+          <p class="name">{{ venue.name }}</p>
+          <p class="address">{{ venue.address }}</p>
+        </div>
+
+        <div class="shot reveal" data-reveal>
+          <div class="photo-wrap">
+            <img
+              class="photo"
+              [src]="venue.photo.src"
+              [attr.width]="venue.photo.width"
+              [attr.height]="venue.photo.height"
+              [alt]="venue.photo.alt"
+              decoding="async"
+              loading="lazy"
+            />
+          </div>
+          <img class="sprig" src="media/loc-sprig.webp" width="412" height="525" alt="" aria-hidden="true" decoding="async" loading="lazy" />
+        </div>
+
+        <app-venue-map
+          class="reveal"
+          data-reveal
+          [preview]="venue.preview"
+          [widget]="venue.widget"
+          [link]="venue.link"
+          [mapTitle]="'Карта: ' + venue.name"
+          [buttonLabel]="'Открыть в Яндекс Картах: ' + venue.name + ', ' + venue.address"
+        />
+      </article>
+    }
+  </div>
+</section>

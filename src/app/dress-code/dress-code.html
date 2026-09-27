@@ -1,0 +1,44 @@
+<section class="dress" id="dresscode" aria-labelledby="dress-title">
+  <div class="col">
+    <header class="head reveal" data-reveal>
+      <h2 class="title" id="dress-title">Дресс-код</h2>
+      <img
+        class="divider"
+        src="media/divider.webp"
+        width="1000"
+        height="147"
+        alt=""
+        aria-hidden="true"
+        decoding="async"
+        loading="lazy"
+      />
+    </header>
+
+    <figure class="people reveal" data-reveal>
+      <img
+        class="crowd"
+        src="media/dress-people.webp"
+        width="1200"
+        height="733"
+        alt="Гости в нарядах бордового, шоколадного, цвета мокко, пудрового, чёрного и молочного оттенков"
+        decoding="async"
+        loading="lazy"
+      />
+      <span class="floor" aria-hidden="true"></span>
+    </figure>
+
+    <div class="say reveal" data-reveal>
+      <p class="lead">Мы будем рады видеть вас</p>
+      <p class="script">в нарядах этих оттенков</p>
+    </div>
+
+    <ul class="palette reveal" data-reveal role="list" aria-label="Палитра">
+      @for (shade of shades; track shade.name; let i = $index) {
+        <li class="shade" [style.--i]="i">
+          <span class="dot" [style.--c]="shade.color" aria-hidden="true"></span>
+          <span class="tag">{{ shade.name }}</span>
+        </li>
+      }
+    </ul>
+  </div>
+</section>

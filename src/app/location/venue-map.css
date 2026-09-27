@@ -1,0 +1,208 @@
+:host {
+  /* the burgundy of the ornament picture: the frame line and the ornament meet in one colour */
+  --frame: #6f0116;
+  --line: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.frame {
+  position: relative;
+  width: min(88vw, 420px);
+}
+
+.box {
+  position: relative;
+  /* the shape of the map picture (615 x 450), so its corners and the Yandex credit in it are never cropped */
+  aspect-ratio: 615 / 450;
+  overflow: hidden;
+  border: var(--line) solid var(--frame);
+  border-radius: 18px;
+  background: #efe7da;
+  color: var(--frame);
+  box-shadow: 0 22px 34px -26px rgb(84 15 8 / 0.55);
+  /* keeps the rounded corners while the map is composited */
+  isolation: isolate;
+}
+
+.preview {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* only if the picture cannot be loaded: a pin in the middle of the empty frame */
+.pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* the movable map: there from the first tap on, but only shown once it has had time to draw its tiles */
+.map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.map.is-shown {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* a transparent cover: the first tap on the map takes it off (a swipe on it scrolls the page) */
+.shield {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shield.is-off {
+  pointer-events: none;
+}
+
+.shield:focus-visible {
+  outline: 3px solid var(--frame);
+  outline-offset: -6px;
+}
+
+/* the round "move the map" mark in the corner, like the controls of a map */
+.hint,
+.spinner {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+
+.hint {
+  display: grid;
+  place-items: center;
+  color: var(--frame);
+  background: rgb(255 255 255 / 0.92);
+  box-shadow: 0 6px 14px -6px rgb(84 15 8 / 0.55);
+  transition: opacity 0.3s ease;
+}
+
+.shield.is-off .hint {
+  opacity: 0;
+}
+
+/* while the map the guest asked for is still drawing */
+.spinner {
+  z-index: 3;
+  border: 3px solid rgb(111 1 22 / 0.18);
+  border-top-color: var(--frame);
+  background: rgb(255 255 255 / 0.85);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.box.is-loading .spinner {
+  opacity: 1;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+ * The ornament sits on the top and bottom edge of the frame. Its own horizontal line (at 90.91% of its height, see
+ * tools/location-assets) lies exactly on the frame's line, so the frame and the ornament read as one drawing. The
+ * bottom one is the same picture turned upside down.
+ */
+.orn {
+  position: absolute;
+  left: 50%;
+  width: 62%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.orn-top {
+  top: calc(var(--line) / 2);
+  transform: translate(-50%, -90.91%);
+}
+
+.orn-bottom {
+  top: calc(100% - var(--line) / 2);
+  transform: translate(-50%, -9.09%) scaleY(-1);
+}
+
+/* ================= the button ================= */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: clamp(40px, 11vw, 50px);
+  padding: 13px clamp(18px, 5vw, 26px) 13px clamp(20px, 5.4vw, 28px);
+  border-radius: 999px;
+  white-space: nowrap;
+  background: var(--ink);
+  color: #fdf4eb;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(16px, 4.8vw, 19px);
+  letter-spacing: 0.03em;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: 0 14px 22px -14px rgb(84 15 8 / 0.75);
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.button:hover {
+  background: #6b1a10;
+}
+
+.button:active {
+  transform: scale(0.97);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .map,
+  .hint,
+  .spinner {
+    transition: none;
+  }
+
+  .box.is-loading .spinner {
+    animation: none;
+  }
+}

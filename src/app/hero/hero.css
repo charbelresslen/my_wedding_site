@@ -1,0 +1,362 @@
+:host {
+  display: block;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ================= layout ================= */
+
+.hero {
+  --vh: 100vh;
+  --names-size: clamp(54px, 16vw, 78px);
+  --kicker-size: clamp(17px, 4.6vw, 21px);
+  --sep-w: clamp(96px, 29vw, 140px);
+  --flower-w: clamp(92px, 31vw, 190px);
+  --flower-h: calc(var(--flower-w) * 1.263);
+
+  /* Width of the column: the whole screen on phones (the photo is full width), 560px at most on tablets. */
+  --col-w: min(100vw, 560px);
+
+  /* Room left under the writing, between the flower heads (it used to hold the "scroll down" cue). It is kept, so the
+     writing stays exactly where it was. */
+  --foot-h: 84px;
+
+  /* Height of the writing block, and everything that must fit under the photo. */
+  --copy-h: calc(2.64 * var(--kicker-size) + var(--sep-w) / 6.8 + 16px + 1.92 * var(--names-size));
+  --reserve: calc(var(--copy-h) + 14px + var(--foot-h));
+
+  /* The photo takes the screen height that is left, but never a shape narrower than the reference crop
+     (aspect 0.758: window + couple) and never wider than 1.12. On tall phones this shows the photo
+     as wide as the screen. */
+  --photo-h: clamp(calc(var(--col-w) / 1.12), calc(var(--vh) - var(--reserve)), calc(var(--col-w) / 0.758));
+
+  position: relative;
+  display: flex;
+  justify-content: center;
+  min-height: var(--vh);
+  overflow: clip;
+}
+
+@supports (height: 100svh) {
+  .hero {
+    --vh: 100svh;
+  }
+}
+
+.card {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--col-w);
+  padding-bottom: var(--foot-h);
+}
+
+/* ================= the photo ================= */
+
+.photo-wrap {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  width: 100%;
+  height: var(--photo-h);
+  overflow: hidden;
+  /* only the last few percent of the floor melt into the page */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 92%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0, #000 92%, transparent 100%);
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* centred on the window and the couple */
+  object-position: 50% 50%;
+  transform: scale(1.05);
+  transform-origin: 50% 60%;
+}
+
+/* ================= the writing ================= */
+
+.copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* The writing is pinned to the bottom, beside the flowers: on a taller phone the spare height goes
+     between the photo and the writing, never between the writing and the flowers. */
+  margin-top: auto;
+  padding-top: 14px;
+  text-align: center;
+  color: var(--ink);
+}
+
+.kicker {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: var(--kicker-size);
+  line-height: 1.32;
+  letter-spacing: 0.035em;
+}
+
+.divider {
+  display: block;
+  width: var(--sep-w);
+  height: auto;
+  margin: 8px 0 6px;
+  /* small and soft: it settles at 80% (see the entrance below) */
+  opacity: 0;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.names {
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: var(--names-size);
+  line-height: 0.96;
+  color: var(--ink);
+}
+
+.name-1 {
+  display: block;
+}
+
+.line-2 {
+  /* staggered like a hand-written second line */
+  display: block;
+  margin-left: 1em;
+}
+
+.name-2 {
+  display: inline-block;
+}
+
+.amp {
+  display: inline-block;
+  margin-right: 0.28em;
+  font-size: 0.78em;
+  color: var(--ink);
+}
+
+/* ================= flowers ================= */
+
+.flower {
+  position: absolute;
+  bottom: 0;
+  z-index: 1;
+  width: var(--flower-w);
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.flower-left {
+  left: 0;
+  transform-origin: 0% 100%;
+}
+
+.flower-right {
+  right: 0;
+  transform-origin: 100% 100%;
+}
+
+/* ================= gold glints ================= */
+
+.sparkles {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.sparkles i {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  height: var(--s);
+  margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+  /* four-pointed star */
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  background: linear-gradient(135deg, #fff6df, var(--gold));
+  opacity: 0;
+}
+
+:host(.is-revealed) .sparkles i {
+  animation: twinkle 4.2s ease-in-out var(--t) infinite;
+}
+
+@keyframes twinkle {
+  0%,
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+  84% {
+    opacity: 0.95;
+    transform: scale(1) rotate(45deg);
+  }
+}
+
+/* ================= screens wider than tall: photo left, writing right ================= */
+
+@media (min-aspect-ratio: 1/1) {
+  .hero {
+    --names-size: clamp(56px, 8vw, 118px);
+    --kicker-size: clamp(18px, 2vw, 28px);
+    --sep-w: clamp(110px, 11vw, 190px);
+    --flower-w: clamp(110px, 14vw, 200px);
+    --pad: clamp(18px, 3.2vw, 46px);
+    --photo-w: min(46vw, 660px, (var(--vh) - 2 * var(--pad) - 44px) * 0.86);
+    --photo-h: calc(var(--photo-w) / 0.86);
+    align-items: center;
+  }
+
+  .card {
+    width: min(100%, 1280px);
+    flex-direction: row;
+    justify-content: center;
+    gap: clamp(28px, 6vw, 96px);
+    padding: var(--pad);
+  }
+
+  .photo-wrap {
+    width: var(--photo-w);
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .copy {
+    margin-top: 0;
+    padding-top: 0;
+  }
+}
+
+/* phones held sideways: smaller flowers */
+@media (min-aspect-ratio: 1/1) and (max-height: 560px) {
+  .flower {
+    width: min(var(--flower-w), 30vh);
+  }
+}
+
+/* ================= entrance (starts the moment the intro video has fully faded out) ================= */
+
+/* Everything below is hidden while the video is still on screen, then ALL of it starts together:
+   the names, the small line, the divider and the flowers share one start time. */
+.reveal {
+  opacity: 0;
+}
+
+/* the divider unrolls from its middle */
+.grow {
+  clip-path: inset(-10% 50% -10% 50%);
+}
+
+.flower-left {
+  opacity: 0;
+  transform: translate(-7%, 9%) scale(0.88) rotate(-2.5deg);
+}
+
+.flower-right {
+  opacity: 0;
+  transform: translate(7%, 9%) scale(0.88) rotate(2.5deg);
+}
+
+:host(.is-revealed) .reveal {
+  opacity: 1;
+  transition: opacity 0.6s ease;
+}
+
+:host(.is-revealed) .grow {
+  opacity: 0.8;
+  clip-path: inset(-10% -2% -10% -2%);
+  transition:
+    opacity 0.6s ease,
+    clip-path 0.6s cubic-bezier(0.4, 0.05, 0.2, 1);
+}
+
+:host(.is-revealed) .flower {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.6s ease,
+    transform 1s cubic-bezier(0.18, 0.7, 0.2, 1);
+}
+
+:host(.is-revealed) .flower-left {
+  animation: sway-left 9s ease-in-out 1.2s infinite alternate;
+}
+
+:host(.is-revealed) .flower-right {
+  animation: sway-right 10s ease-in-out 1.2s infinite alternate;
+}
+
+:host(.is-revealed) .photo {
+  transform: scale(1);
+  transition: transform 8s cubic-bezier(0.2, 0.55, 0.2, 1);
+}
+
+@keyframes sway-left {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(1.1deg) translateY(-1px);
+  }
+}
+
+@keyframes sway-right {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-1.1deg) translateY(-1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .divider,
+  :host(.is-revealed) .divider {
+    opacity: 0.8;
+    clip-path: none;
+    transition: none;
+  }
+
+  .reveal,
+  .flower-left,
+  .flower-right,
+  :host(.is-revealed) .reveal,
+  :host(.is-revealed) .flower {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+    transition: none;
+    animation: none;
+  }
+
+  .photo,
+  :host(.is-revealed) .photo {
+    transform: none;
+    transition: none;
+  }
+
+  .sparkles {
+    display: none;
+  }
+}

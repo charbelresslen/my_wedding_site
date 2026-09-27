@@ -1,0 +1,122 @@
+<section class="rsvp" id="rsvp" aria-labelledby="rsvp-title">
+  <div class="col">
+    <span class="glow" aria-hidden="true"></span>
+
+    <h2 class="title reveal" data-reveal id="rsvp-title">Подтверждение</h2>
+
+    <img class="divider reveal" data-reveal src="media/divider.webp" width="1000" height="147" alt="" aria-hidden="true" decoding="async" loading="lazy" />
+
+    <p class="lead reveal" data-reveal>
+      Чтобы мы могли с любовью подготовить этот день, пожалуйста, подтвердите ваше присутствие до&nbsp;30&nbsp;ноября 2026&nbsp;года.
+    </p>
+
+    <button #trigger class="cta reveal" data-reveal type="button" (click)="openForm()">RSVP</button>
+  </div>
+
+  @if (open()) {
+    <div class="overlay" (pointerdown)="onOverlayPointerDown($event)">
+      <div
+        #dialog
+        class="dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="rsvp-dialog-title"
+        (keydown)="onDialogKeydown($event)"
+      >
+        <button class="close" type="button" aria-label="Закрыть" (click)="close()">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+        </button>
+
+        @if (!submitted()) {
+          <h3 class="dialog-title" id="rsvp-dialog-title">Анкета гостя</h3>
+
+          <label class="field">
+            <span class="field-label">Имя и фамилия</span>
+            <input
+              #nameField
+              class="text-input"
+              type="text"
+              name="fullName"
+              autocomplete="name"
+              maxlength="150"
+              [value]="fullName()"
+              (input)="onNameInput($event)"
+            />
+          </label>
+
+          <fieldset class="field">
+            <legend class="field-label">Вы будете</legend>
+            <div class="choices">
+              <label class="choice">
+                <input type="radio" name="attendance" [checked]="attendance() === 'both'" (change)="setAttendance('both')" />
+                <span>На церемонии в ЗАГСе и на банкете</span>
+              </label>
+              <label class="choice">
+                <input type="radio" name="attendance" [checked]="attendance() === 'zags_only'" (change)="setAttendance('zags_only')" />
+                <span>Только на церемонии в ЗАГСе</span>
+              </label>
+            </div>
+          </fieldset>
+
+          @if (attendance() === 'both') {
+            @if (menuLoading()) {
+              <p class="hint">Загружаем меню…</p>
+            } @else if (menuError()) {
+              <p class="hint error">
+                Не удалось загрузить меню.
+                <button class="retry" type="button" (click)="fetchMenu()">Попробовать снова</button>
+              </p>
+            } @else if (menu(); as m) {
+              <fieldset class="field">
+                <legend class="field-label">Ваш напиток</legend>
+                <div class="choices drinks">
+                  @for (drink of m.drinkOptions; track drink.id) {
+                    <label class="choice">
+                      <input type="radio" name="drink" [checked]="drinkOptionId() === drink.id" (change)="drinkOptionId.set(drink.id)" />
+                      <span>{{ drink.name }}</span>
+                    </label>
+                  }
+                </div>
+              </fieldset>
+
+              @for (category of m.foodCategories; track category.id) {
+                <fieldset class="field">
+                  <legend class="field-label">{{ category.name }}</legend>
+                  <div class="choices">
+                    @for (item of category.items; track item.id) {
+                      <label class="choice">
+                        <input
+                          type="radio"
+                          [attr.name]="'food-' + category.id"
+                          [checked]="foodChoices()[category.id] === item.id"
+                          (change)="setFoodChoice(category.id, item.id)"
+                        />
+                        <span>{{ item.name }}</span>
+                      </label>
+                    }
+                  </div>
+                </fieldset>
+              }
+            }
+          }
+
+          @if (submitError()) {
+            <p class="hint error" role="alert">{{ submitError() }}</p>
+          }
+
+          <button class="submit" type="button" [disabled]="!canSubmit() || submitting()" (click)="submit()">
+            {{ submitting() ? 'Отправляем…' : 'Отправить' }}
+          </button>
+        } @else {
+          <div class="done">
+            <svg class="check" viewBox="0 0 52 52" width="52" height="52" aria-hidden="true">
+              <circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="2" />
+              <path d="M15 27l7 7 15-15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <p class="done-text">Спасибо, {{ fullName() }}! Мы очень ждём встречи с вами.</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</section>

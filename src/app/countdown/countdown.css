@@ -1,0 +1,181 @@
+:host {
+  display: block;
+}
+
+.countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(28px, 8vw, 52px) 12px clamp(56px, 15vw, 100px);
+  text-align: center;
+  color: var(--ink);
+  overflow: clip;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(36px, 10.5vw, 54px);
+  line-height: 1.05;
+}
+
+.divider {
+  display: block;
+  width: clamp(96px, 29vw, 140px);
+  height: auto;
+  margin: 4px 0 clamp(18px, 5vw, 30px);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ================= the clock ================= */
+
+.clock {
+  /* one size for every digit; the labels have their own */
+  --digit: clamp(38px, 12.4vw, 62px);
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: clamp(0px, 0.8vw, 6px);
+  font-size: var(--digit);
+}
+
+.unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/*
+ * Great Vibes leans to the right (its digits by 21 degrees on average, measured on the rendered glyphs); the digits
+ * are straightened by skewing them back by that much, so they stand upright and keep clear of their neighbours and of
+ * the edges of their window.
+ */
+.digits {
+  display: flex;
+}
+
+/*
+ * Each digit lives in its own window, exactly one digit high. A digit that rolls is pushed out of the window and the
+ * next one comes in right behind it, so they never overlap. The window is a little wider than the digit's advance
+ * (and pulled back with negative margins) so that no flourish is ever cut off at the sides.
+ */
+.cell {
+  display: inline-grid;
+  width: 0.7em;
+  height: 1.34em;
+  margin-inline: -0.1em;
+  overflow: hidden;
+}
+
+/* the old and the new digit sit in the same spot; the rolling moves them */
+.glyph {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-script);
+  font-size: 1em;
+}
+
+.ink {
+  display: block;
+  line-height: 1.1;
+  transform: skewX(21deg);
+}
+
+.colon {
+  display: grid;
+  place-items: center;
+  height: 1.34em;
+  font-family: var(--font-script);
+  font-size: 1em;
+  line-height: 1.1;
+  opacity: 0.7;
+  transform: skewX(21deg);
+}
+
+.label {
+  margin-top: -0.04em;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(13px, 3.7vw, 18px);
+  line-height: 1.2;
+  text-transform: capitalize;
+  opacity: 0.9;
+}
+
+/* ================= rolling digits ================= */
+
+/*
+ * The old digit goes up and out of its window while the next one rises into it from below, at the same speed and
+ * with the same easing, so the gap between them stays exactly one window: they never touch, and nothing fades.
+ */
+@keyframes roll-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes roll-out {
+  from {
+    transform: none;
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+.glyph.enter {
+  animation: roll-in 0.6s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+.glyph.leave {
+  animation: roll-out 0.6s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+/* ================= entrance (when the section scrolls into view) ================= */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+:host(.is-visible) .reveal {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.8s ease,
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+:host(.is-visible) .divider {
+  transition-delay: 0.12s;
+}
+
+:host(.is-visible) .clock {
+  transition-delay: 0.26s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  :host(.is-visible) .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  /* the digits simply change */
+  .glyph.enter {
+    animation: none;
+  }
+
+  .glyph.leave {
+    display: none;
+  }
+}

@@ -1,0 +1,45 @@
+<section class="date" id="date" aria-labelledby="date-title">
+  <h2 class="title reveal" id="date-title">{{ month }}</h2>
+  <p class="year reveal">{{ year }}</p>
+
+  <img
+    class="divider reveal"
+    src="media/divider.webp"
+    width="1000"
+    height="147"
+    alt=""
+    aria-hidden="true"
+    decoding="async"
+    loading="lazy"
+  />
+
+  <div class="card reveal" aria-hidden="true">
+    <div class="heads">
+      @for (head of weekdayHeads; track head.text) {
+        <span [class.is-wedding]="head.wedding">{{ head.text }}</span>
+      }
+    </div>
+
+    <div class="days">
+      @for (cell of days; track $index; let i = $index) {
+        <span class="day" [class.is-empty]="!cell.day" [class.is-wedding]="cell.wedding" [style.--i]="i">
+          @if (cell.wedding) {
+            <span class="disc"><span class="pulse"></span><span class="num">{{ cell.day }}</span></span>
+          } @else if (cell.day) {
+            {{ cell.day }}
+          }
+        </span>
+      }
+    </div>
+  </div>
+
+  <p class="caption reveal" aria-hidden="true">{{ caption }}</p>
+
+  <!-- the exact middle of the section: the petals start when it reaches the middle of the screen -->
+  <span class="middle" aria-hidden="true"></span>
+
+  <!-- The whole date as a sentence, for screen readers. -->
+  <p class="visually-hidden">{{ spoken }}</p>
+</section>
+
+<app-petal-shower [run]="petalsRun()" />

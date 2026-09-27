@@ -1,0 +1,295 @@
+:host {
+  display: block;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.invite {
+  padding: clamp(8px, 3vw, 28px) 0 clamp(8px, 3vw, 24px);
+  overflow: clip;
+  color: var(--ink);
+}
+
+/*
+ * The stage is what the guest sees: the full width of the phone (never wider than 640px on a big screen).
+ * The wall of the hall is drawn a little larger than a narrow phone, so the panel the writing sits on is big enough
+ * to read; the sides of the wall that do not fit are simply cropped. All sizes below are fractions of the wall's
+ * width (container query units), so the writing always stays inside its panel.
+ */
+.stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  width: min(100%, 640px);
+  margin-inline: auto;
+  /* a little room under the wall, where its faded bottom edge has already melted into the page: the peonies sit
+     down there, low enough not to collide with the carved ornaments of the wall */
+  padding-bottom: clamp(14px, 5vw, 32px);
+  overflow: clip;
+}
+
+.card {
+  position: relative;
+  width: max(100%, min(460px, 143%));
+  aspect-ratio: 1024 / 1350;
+  container-type: inline-size;
+}
+
+/* the wall melts into the page at the top and the bottom (and at the sides on a big screen) */
+.wall {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%);
+}
+
+@media (min-width: 641px) {
+  .wall {
+    -webkit-mask-image:
+      linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%),
+      linear-gradient(to right, transparent 0, #000 10%, #000 90%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%),
+      linear-gradient(to right, transparent 0, #000 10%, #000 90%, transparent 100%);
+    mask-composite: intersect;
+  }
+}
+
+/* ================= the writing, on the big panel of the wall ================= */
+
+.writing {
+  position: absolute;
+  left: 21%;
+  width: 58%;
+  top: 18.5%;
+  height: 54%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.kicker {
+  margin: 0;
+  max-width: 62%;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 2.45cqw;
+  line-height: 1.5;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.names {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 4.6cqw 0 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.name {
+  display: block;
+  font-size: 12.2cqw;
+  line-height: 0.98;
+}
+
+/* "& Анна" on the second line, the ampersand a little smaller, exactly as in the first section */
+.amp {
+  display: inline-block;
+  margin-right: 0.28em;
+  font-size: 0.78em;
+}
+
+.divider {
+  display: block;
+  width: 24cqw;
+  height: auto;
+  margin: 1.2cqw 0 1.8cqw;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.dear {
+  margin: 0;
+  font-family: var(--font-script);
+  font-size: 6cqw;
+  line-height: 1.1;
+  /* Great Vibes has a very narrow space */
+  word-spacing: 0.14em;
+}
+
+.note {
+  margin: 1cqw 0 0;
+  /* narrow enough to stay between the two ornaments in the bottom corners of the panel */
+  max-width: 86%;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 3.05cqw;
+  line-height: 1.4;
+  text-wrap: balance;
+}
+
+/* ================= the peonies in the two bottom corners ================= */
+
+.flower {
+  position: absolute;
+  bottom: 0;
+  width: clamp(84px, 27%, 176px);
+  pointer-events: none;
+}
+
+.flower img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.flower-left {
+  left: 0;
+  transform-origin: 30% 100%;
+}
+
+.flower-right {
+  right: 0;
+  transform-origin: 70% 100%;
+}
+
+/* ================= entrance (when the section scrolls into view) ================= */
+
+.wall {
+  opacity: 0;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.flower {
+  opacity: 0;
+}
+
+.flower-left {
+  transform: translate(-6%, 8%) scale(0.9) rotate(-3deg);
+}
+
+.flower-right {
+  transform: translate(6%, 8%) scale(0.9) rotate(3deg);
+}
+
+:host(.is-visible) .wall {
+  opacity: 1;
+  transition: opacity 1.2s ease;
+}
+
+:host(.is-visible) .reveal {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.8s ease,
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+:host(.is-visible) .divider {
+  opacity: 0.85;
+}
+
+:host(.is-visible) .kicker {
+  transition-delay: 0.35s;
+}
+
+:host(.is-visible) .name-1 {
+  transition-delay: 0.5s;
+}
+
+:host(.is-visible) .name-2 {
+  transition-delay: 0.66s;
+}
+
+:host(.is-visible) .divider {
+  transition-delay: 0.9s;
+}
+
+:host(.is-visible) .dear {
+  transition-delay: 1.05s;
+}
+
+:host(.is-visible) .note {
+  transition-delay: 1.2s;
+}
+
+:host(.is-visible) .flower {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.9s ease 0.5s,
+    transform 1.4s cubic-bezier(0.18, 0.7, 0.2, 1) 0.5s;
+}
+
+:host(.is-visible) .flower-left {
+  animation: sway-left 9s ease-in-out 2.2s infinite alternate;
+}
+
+:host(.is-visible) .flower-right {
+  animation: sway-right 10s ease-in-out 2.2s infinite alternate;
+}
+
+@keyframes sway-left {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(1.2deg) translateY(-1px);
+  }
+}
+
+@keyframes sway-right {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-1.2deg) translateY(-1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wall,
+  .reveal,
+  .flower,
+  :host(.is-visible) .wall,
+  :host(.is-visible) .reveal,
+  :host(.is-visible) .flower {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+
+  .divider,
+  :host(.is-visible) .divider {
+    opacity: 0.85;
+  }
+}

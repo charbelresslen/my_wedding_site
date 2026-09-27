@@ -1,0 +1,299 @@
+:host {
+  display: block;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.date {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(48px, 14vw, 80px) 16px clamp(56px, 15vw, 96px);
+  text-align: center;
+  color: var(--ink);
+  overflow: clip;
+}
+
+/* the month, in the calligraphy of the other titles, and the year in spaced capitals under it */
+.title {
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(56px, 16vw, 84px);
+  line-height: 1.05;
+  text-transform: capitalize;
+}
+
+.year {
+  margin: 2px 0 0;
+  /* the letter-spacing adds a gap after the last figure: pad the first side to keep the year centred */
+  padding-left: 0.5em;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(16px, 4.4vw, 20px);
+  line-height: 1;
+  letter-spacing: 0.5em;
+  font-variant-numeric: lining-nums;
+}
+
+.divider {
+  display: block;
+  width: clamp(96px, 29vw, 140px);
+  height: auto;
+  margin: 14px 0 clamp(20px, 6vw, 30px);
+  opacity: 0;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* the exact middle of the section (an invisible marker that the petals wait for) */
+.middle {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 1px;
+  height: 2px;
+  pointer-events: none;
+}
+
+/* ================= the calendar ================= */
+
+/*
+ * Every size inside the card is worked out from the card's own width, in plain lengths (no aspect-ratio, no grid
+ * centring of unsized boxes): a column is a seventh of the room inside the card, a row is a little less than a column
+ * is wide, and the disc of the wedding day is a little narrower than a column. So every browser gets the same boxes,
+ * and the number in the disc sits on the same line as the numbers next to it.
+ */
+.card {
+  --pad: clamp(12px, 3.6vw, 20px);
+  --col: calc((min(92vw, 400px) - 2px - 2 * var(--pad)) / 7);
+  --row: calc(var(--col) * 0.94);
+  --disc: calc(var(--col) * 0.92);
+  width: min(92vw, 400px);
+  padding: clamp(18px, 5vw, 26px) var(--pad) clamp(14px, 4vw, 20px);
+  border: 1px solid rgb(84 15 8 / 0.14);
+  border-radius: 24px;
+  background: linear-gradient(165deg, #fffaf2 0%, #f9eddd 100%);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.8) inset,
+    0 26px 44px -30px rgb(84 15 8 / 0.5);
+}
+
+/* Mon ... Sun, small and spaced, over a hairline */
+.heads {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  padding-bottom: clamp(10px, 3vw, 14px);
+  border-bottom: 1px solid rgb(84 15 8 / 0.16);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(12px, 3.3vw, 14px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.heads span {
+  opacity: 0.66;
+}
+
+/* the head over the day of the wedding is stronger */
+.heads .is-wedding {
+  opacity: 1;
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, var(--col));
+  grid-auto-rows: var(--row);
+  row-gap: clamp(2px, 1vw, 6px);
+  padding-top: clamp(8px, 2.4vw, 12px);
+}
+
+.day {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--row);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(18px, 5.2vw, 23px);
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+  opacity: 0.68;
+}
+
+/* the day of the wedding: a burgundy disc, with a soft ring that breathes out around it */
+.day.is-wedding {
+  z-index: 1;
+  opacity: 1;
+}
+
+/* the disc is centred on its cell by exact offsets, the number inside it by flex: the number ends up on the same
+   line as the numbers of the other days */
+.disc {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--disc);
+  height: var(--disc);
+  margin: calc(var(--disc) / -2) 0 0 calc(var(--disc) / -2);
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, #7a1f16, var(--ink) 62%);
+  color: #fdf4eb;
+  box-shadow: 0 12px 20px -10px rgb(84 15 8 / 0.7);
+}
+
+.num {
+  font-weight: 700;
+  line-height: 1;
+}
+
+.pulse {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgb(84 15 8 / 0.45);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* under the calendar: "Суббота, 19 декабря 2026" */
+.caption {
+  margin: clamp(20px, 6vw, 30px) 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(18px, 5vw, 22px);
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+}
+
+/* ================= entrance (when the section scrolls into view) ================= */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.day:not(.is-empty) {
+  opacity: 0;
+}
+
+.day:not(.is-empty):not(.is-wedding) {
+  transform: translateY(8px);
+}
+
+.disc {
+  transform: scale(0);
+}
+
+:host(.is-visible) .reveal {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.8s ease,
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+:host(.is-visible) .year {
+  transition-delay: 0.1s;
+}
+
+:host(.is-visible) .divider {
+  opacity: 0.8;
+  transition-delay: 0.2s;
+}
+
+:host(.is-visible) .card {
+  transition-delay: 0.3s;
+}
+
+/* the days come in one after the other, like a wave running down the month */
+:host(.is-visible) .day:not(.is-empty) {
+  opacity: 0.68;
+  transition:
+    opacity 0.6s ease calc(0.65s + var(--i, 0) * 0.024s),
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) calc(0.65s + var(--i, 0) * 0.024s);
+}
+
+:host(.is-visible) .day:not(.is-empty):not(.is-wedding) {
+  transform: none;
+}
+
+:host(.is-visible) .day.is-wedding {
+  opacity: 1;
+}
+
+/* then the disc pops onto the day of the wedding, and the ring breathes out three times */
+:host(.is-visible) .disc {
+  transform: none;
+  transition: transform 0.7s cubic-bezier(0.3, 1.5, 0.4, 1) 1.5s;
+}
+
+:host(.is-visible) .pulse {
+  animation: breathe 2.6s ease-out 2.1s 3 both;
+}
+
+@keyframes breathe {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.75);
+    opacity: 0;
+  }
+}
+
+:host(.is-visible) .caption {
+  transition-delay: 1.7s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .day:not(.is-empty),
+  .disc,
+  :host(.is-visible) .reveal,
+  :host(.is-visible) .day:not(.is-empty),
+  :host(.is-visible) .disc {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .day:not(.is-empty),
+  :host(.is-visible) .day:not(.is-empty) {
+    opacity: 0.68;
+  }
+
+  .day.is-wedding,
+  :host(.is-visible) .day.is-wedding {
+    opacity: 1;
+  }
+
+  .divider,
+  :host(.is-visible) .divider {
+    opacity: 0.8;
+  }
+
+  .pulse,
+  :host(.is-visible) .pulse {
+    animation: none;
+    display: none;
+  }
+}

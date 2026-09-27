@@ -1,0 +1,55 @@
+:host {
+  display: contents;
+}
+
+audio {
+  display: none;
+}
+
+.toggle {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 30;
+  display: grid;
+  place-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgb(84 15 8 / 0.18);
+  border-radius: 50%;
+  background: rgb(253 244 235 / 0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: var(--ink);
+  box-shadow: 0 8px 18px -8px rgb(50 8 5 / 0.4);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  animation: fade-in 0.6s ease 0.4s backwards;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+@media (hover: hover) {
+  .toggle:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px -8px rgb(50 8 5 / 0.5);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle {
+    animation: none;
+  }
+
+  .toggle:hover {
+    transform: none;
+  }
+}
