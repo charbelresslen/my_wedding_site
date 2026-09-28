@@ -13,13 +13,16 @@ import {
 const VIDEO_SRC = 'media/envelope.mp4';
 
 /**
- * Length of the fade into the main page. It is timed to finish as the video ends, and to START right as the
- * envelope's own flaps begin to lift (about 2s before the end of envelope.mp4) - so the site's own photo, already
- * sitting fully rendered underneath the whole time, starts bleeding through exactly as that light appears, instead
- * of the flaps finishing their opening (revealing nothing but light - baked into the video itself) and only then
- * cutting to the page. A longer fade also just reads as less abrupt than a quick 1.4s cut did.
+ * Length of the fade into the main page. envelope.mp4 now cuts, on its own (baked into the file), from the sealed
+ * envelope straight to the site's own hero photo at around 6.1s into its ~8.15s length, then holds on that frame
+ * to the end - so this fade no longer needs to bridge an "opening" moment itself; it only needs to start safely
+ * AFTER that cut (never during it, or the CSS layer would still show the sealed envelope while the real page
+ * underneath - already showing the same photo - starts bleeding through, a jarring double image). A short fade
+ * is enough (there is no content gap left to bridge, both layers show the same picture), but it must start with a
+ * real margin past that cut - about a full second of the video just holding still, undisturbed, before the CSS
+ * layer touches anything - or it reads as cutting away too soon, right on the heels of the reveal.
  */
-const FADE_SECONDS = 2;
+const FADE_SECONDS = 0.9;
 const FADE_SECONDS_REDUCED_MOTION = 0.4;
 /** Start slightly early so the overlay is fully transparent by the last frame. */
 const FADE_LEAD_SECONDS = 0.1;

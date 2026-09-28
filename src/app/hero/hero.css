@@ -15,27 +15,54 @@
 
 .hero {
   --vh: 100vh;
-  --names-size: clamp(54px, 16vw, 78px);
-  --kicker-size: clamp(17px, 4.6vw, 21px);
-  --sep-w: clamp(96px, 29vw, 140px);
-  --flower-w: clamp(92px, 31vw, 190px);
-  --flower-h: calc(var(--flower-w) * 1.263);
 
   /* Width of the column: the whole screen on phones (the photo is full width), 560px at most on tablets. */
   --col-w: min(100vw, 560px);
 
-  /* Room left under the writing, between the flower heads (it used to hold the "scroll down" cue). It is kept, so the
-     writing stays exactly where it was. */
-  --foot-h: 84px;
+  /*
+   * "Ideal" sizes for every part of this section - the photo, the writing, the flowers - each driven only by
+   * --col-w, never by how much vertical room happens to be available. This is the same composition envelope.mp4
+   * itself shows: the video only ever cares about its own fixed 9:16 shape, never about the guest's actual screen
+   * proportions, and still always displays whole. --i-photo-h in particular is a fixed crop (aspect 0.758: window +
+   * couple), matching that video's own framing of this exact photo.
+   */
+  --i-names: clamp(54px, 16vw, 78px);
+  --i-kicker: clamp(17px, 4.6vw, 21px);
+  --i-sep: clamp(96px, 29vw, 140px);
+  --i-flower: clamp(92px, 31vw, 190px);
+  --i-foot: 84px;
+  --i-copy-h: calc(2.64 * var(--i-kicker) + var(--i-sep) / 6.8 + 16px + 1.92 * var(--i-names));
+  --i-photo-h: calc(var(--col-w) / 0.758);
+  --i-total-h: calc(var(--i-photo-h) + var(--i-copy-h) + 14px + var(--i-foot));
 
-  /* Height of the writing block, and everything that must fit under the photo. */
-  --copy-h: calc(2.64 * var(--kicker-size) + var(--sep-w) / 6.8 + 16px + 1.92 * var(--names-size));
-  --reserve: calc(var(--copy-h) + 14px + var(--foot-h));
+  /*
+   * Scale the WHOLE composition - photo, writing and flowers together, by the same factor - down when it would not
+   * otherwise fit the screen's actual height, and never scale it up past 1. This is exactly how envelope.mp4 itself
+   * behaves: it never changes what it shows, only how big it's displayed on a given screen.
+   *
+   * Shrinking only the photo to make room (an earlier version of this file did that, via a plain `--photo-h` clamp
+   * driven by `vh - reserve`) is wrong in two ways: it changes the photo's own crop depending on the device - a
+   * phone with a shorter effective 100vh, because of its address bar/toolbar (this varies a lot between browsers),
+   * would show a shorter, more-zoomed-OUT photo than a taller one - and on a REALLY short device it still cannot
+   * push the writing and flowers off-screen, only the photo shrinks. Scaling everything together fixes both: the
+   * photo's crop never changes, and the writing/flowers always end up on the very same screen as it, because they
+   * shrink by the same amount the photo would have needed to shrink by anyway.
+   *
+   * The `- 6px` is a small safety margin, not a magic number: real browsers round sub-pixel values slightly
+   * differently between one CSS length and another (here, --vh and the chain of calc()s making up --i-total-h), so
+   * fitting to the exact, unpadded pixel occasionally lands a fraction of a pixel over - enough to make the flowers
+   * spill below the fold on some screens, which is exactly the one thing this rule exists to prevent.
+   */
+  --fit: min(1, calc((var(--vh) - 10px) / var(--i-total-h)));
 
-  /* The photo takes the screen height that is left, but never a shape narrower than the reference crop
-     (aspect 0.758: window + couple) and never wider than 1.12. On tall phones this shows the photo
-     as wide as the screen. */
-  --photo-h: clamp(calc(var(--col-w) / 1.12), calc(var(--vh) - var(--reserve)), calc(var(--col-w) / 0.758));
+  --names-size: calc(var(--i-names) * var(--fit));
+  --kicker-size: calc(var(--i-kicker) * var(--fit));
+  --sep-w: calc(var(--i-sep) * var(--fit));
+  --flower-w: calc(var(--i-flower) * var(--fit));
+  --flower-h: calc(var(--flower-w) * 1.263);
+  --foot-h: calc(var(--i-foot) * var(--fit));
+  --copy-h: calc(var(--i-copy-h) * var(--fit));
+  --photo-h: calc(var(--i-photo-h) * var(--fit));
 
   position: relative;
   display: flex;
@@ -81,7 +108,10 @@
   object-fit: cover;
   /* centred on the window and the couple */
   object-position: 50% 50%;
-  transform: scale(1.05);
+  /* A fixed, permanent crop - no zoom animation any more (see the settled-state section below) - chosen to roughly
+     match how envelope.mp4 itself frames this same photo, so nothing visibly shifts once the video hands off to it. */
+  transform: scale(1.30);
+  padding-bottom: 2.5em !important;
   transform-origin: 50% 60%;
 }
 
@@ -255,61 +285,26 @@
   }
 }
 
-/* ================= entrance (starts the moment the intro video has fully faded out) ================= */
+/* ================= settled state (no entrance animation) ================= */
 
-/* Everything below is hidden while the video is still on screen, then ALL of it starts together:
-   the names, the small line, the divider and the flowers share one start time. */
-.reveal {
-  opacity: 0;
-}
-
-/* the divider unrolls from its middle */
+/*
+ * The envelope video now cuts to this exact hero already fully formed - photo, names, divider and flowers all
+ * settled - and holds on it before the CSS fade even starts (see intro-video.ts). So none of this plays an entrance
+ * of its own any more: animating it in here would fight the video's own baked-in reveal and read as a jarring
+ * "pop" the instant the overlay disappears, right on top of content the guest already saw a moment earlier. Only
+ * the small continuous idle motion below (the flowers swaying, the sparkles twinkling) keeps running regardless.
+ */
 .grow {
-  clip-path: inset(-10% 50% -10% 50%);
+  opacity: 0.8;
+  clip-path: inset(-10% -2% -10% -2%);
 }
 
 .flower-left {
-  opacity: 0;
-  transform: translate(-7%, 9%) scale(0.88) rotate(-2.5deg);
-}
-
-.flower-right {
-  opacity: 0;
-  transform: translate(7%, 9%) scale(0.88) rotate(2.5deg);
-}
-
-:host(.is-revealed) .reveal {
-  opacity: 1;
-  transition: opacity 0.6s ease;
-}
-
-:host(.is-revealed) .grow {
-  opacity: 0.8;
-  clip-path: inset(-10% -2% -10% -2%);
-  transition:
-    opacity 0.6s ease,
-    clip-path 0.6s cubic-bezier(0.4, 0.05, 0.2, 1);
-}
-
-:host(.is-revealed) .flower {
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity 0.6s ease,
-    transform 1s cubic-bezier(0.18, 0.7, 0.2, 1);
-}
-
-:host(.is-revealed) .flower-left {
   animation: sway-left 9s ease-in-out 1.2s infinite alternate;
 }
 
-:host(.is-revealed) .flower-right {
+.flower-right {
   animation: sway-right 10s ease-in-out 1.2s infinite alternate;
-}
-
-:host(.is-revealed) .photo {
-  transform: scale(1);
-  transition: transform 8s cubic-bezier(0.2, 0.55, 0.2, 1);
 }
 
 @keyframes sway-left {
@@ -331,29 +326,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .divider,
-  :host(.is-revealed) .divider {
-    opacity: 0.8;
-    clip-path: none;
-    transition: none;
-  }
-
-  .reveal,
+  /* Everything above is already static (no entrance to play); only the two continuous idle motions need disabling. */
   .flower-left,
-  .flower-right,
-  :host(.is-revealed) .reveal,
-  :host(.is-revealed) .flower {
-    opacity: 1;
-    transform: none;
-    clip-path: none;
-    transition: none;
+  .flower-right {
     animation: none;
-  }
-
-  .photo,
-  :host(.is-revealed) .photo {
-    transform: none;
-    transition: none;
   }
 
   .sparkles {
