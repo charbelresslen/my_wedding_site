@@ -64,10 +64,6 @@ export class IntroVideo {
   readonly finished = output<void>();
   /** Emits when the video has faded to (almost) nothing, a little before `finished`. */
   readonly almostGone = output<void>();
-  /** Emits the instant the envelope is tapped, synchronously inside that click — before the video actually starts
-   *  playing. A parent can use this same real user gesture to unlock another media element's autoplay (see
-   *  `BackgroundMusic.unlockForGesture`), which cannot be done reliably from a later, gesture-less callback. */
-  readonly opened = output<void>();
 
   protected readonly phase = signal<Phase>('loading');
   /** True once frames have really played (changes the wording of the tap prompt: open vs continue). */
@@ -211,16 +207,11 @@ export class IntroVideo {
     });
   }
 
-  /**
-   * Playback started by a tap (with sound). This is the ONLY way the video ever starts — a real click is also
-   * the one reliable place to unlock another media element's autoplay (see `opened`), so it is emitted here,
-   * synchronously, before the (async) `video.play()` call.
-   */
+  /** Playback started by a tap (with sound). This is the ONLY way the video ever starts. */
   private async play(): Promise<void> {
     const video = this.videoRef().nativeElement;
     this.needsTap.set(false);
     this.phase.set('playing');
-    this.opened.emit();
     try {
       await video.play();
     } catch {

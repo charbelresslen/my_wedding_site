@@ -27,7 +27,7 @@ describe('DressCode', () => {
     expect(el.querySelector('.floor')?.getAttribute('aria-hidden')).toBe('true');
   });
 
-  it('draws six circles: the four of the user (burgundy, chocolate, mocha, dusty pink) plus black and the colour of the page', () => {
+  it('draws six circles: the four of the user (burgundy, chocolate, mocha, dusty pink) plus black and cream', () => {
     const el: HTMLElement = create().nativeElement;
     const shades = [...el.querySelectorAll('.shade')].map((s) => ({
       name: s.querySelector('.tag')?.textContent?.trim(),
@@ -40,15 +40,15 @@ describe('DressCode', () => {
       { name: 'Мокко', color: '#8d6752' },
       { name: 'Пудровый', color: '#cf9f9d' },
       { name: 'Чёрный', color: '#161312' },
-      { name: 'Кремовый', color: 'var(--bg)' },
+      { name: 'Кремовый', color: 'var(--paper)' },
     ]);
   });
 
-  it('makes the last circle exactly the colour of the site background', () => {
+  it('makes the last circle the site\'s ivory tone, not plain white', () => {
     const el: HTMLElement = create().nativeElement;
     const last = [...el.querySelectorAll<HTMLElement>('.dot')].pop()!;
-    // --bg in src/styles.css
-    expect(last.style.getPropertyValue('--c')).toBe('var(--bg)');
+    // --paper in src/styles.css
+    expect(last.style.getPropertyValue('--c')).toBe('var(--paper)');
   });
 
   it('names the palette in words for screen readers, and hides the circles themselves', () => {

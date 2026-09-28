@@ -35,9 +35,8 @@
     <!-- Fades in only after a moment, so a fast load never flashes it. -->
     <span class="caption wait" lang="ru" role="status">Загрузка…</span>
   } @else if (phase() === 'ready') {
-    <!-- Invisible tap target with a caption prompt: opening the envelope always needs this real tap, both so the
-         guest chooses when the video's own sound starts, and because it is also what allows the background music
-         to start at all (see IntroVideo.opened / BackgroundMusic.unlockForGesture). -->
+    <!-- Invisible tap target with a caption prompt: opening the envelope always needs this real tap, so the guest
+         chooses when the video's own sound starts, instead of the browser's autoplay rules deciding for them. -->
     <button
       type="button"
       class="tap"

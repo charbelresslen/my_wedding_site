@@ -1,11 +1,10 @@
-import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
-import { BackgroundMusic } from './background-music/background-music';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Home } from './home/home';
 import { IntroVideo } from './intro-video/intro-video';
 
 @Component({
   selector: 'app-root',
-  imports: [Home, IntroVideo, BackgroundMusic],
+  imports: [Home, IntroVideo],
   templateUrl: './app.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -14,8 +13,6 @@ export class App {
   protected readonly introDone = signal(false);
   /** The page may play its entrance animation. */
   protected readonly revealed = signal(false);
-
-  private readonly music = viewChild(BackgroundMusic);
 
   constructor() {
     // Handy while building: open the site with ?nointro to skip the video.
@@ -29,12 +26,6 @@ export class App {
   /** The video has faded to (almost) nothing: the page's entrance starts now, without waiting for the overlay to go. */
   protected reveal(): void {
     this.revealed.set(true);
-  }
-
-  /** The envelope was just tapped: use that same real gesture to unlock the background music too (see
-   *  `IntroVideo.opened` / `BackgroundMusic.unlockForGesture`), well before it actually starts playing. */
-  protected unlockAudio(): void {
-    this.music()?.unlockForGesture();
   }
 
   /** The intro video has faded out (or cannot be played): from now on the page is the site. */

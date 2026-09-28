@@ -72,8 +72,10 @@
   position: relative;
   z-index: 0;
   width: 84%;
-  /* shifted to the start (not centred): more of it shows past the smaller photo taped over its corner */
-  margin-inline: 0 auto;
+  /* pushed left past the board's own left padding (not just flush with it): Anna, on the right side of this photo,
+     otherwise sits almost exactly where the smaller photo taped over the corner covers it - shifting the whole
+     photo further left moves her out from under that overlap instead. */
+  margin-inline: -15% auto;
   padding: 3.6% 3.6% 12%;
   transform: rotate(-2.5deg);
 }

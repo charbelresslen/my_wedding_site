@@ -1,6 +1,5 @@
 <!-- The main page is always rendered underneath; the intro overlay fades away to reveal it. -->
 <app-home [revealed]="revealed()" />
-<app-background-music [playing]="revealed()" />
 @if (!introDone()) {
-  <app-intro-video (opened)="unlockAudio()" (almostGone)="reveal()" (finished)="finishIntro()" />
+  <app-intro-video (almostGone)="reveal()" (finished)="finishIntro()" />
 }

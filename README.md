@@ -329,27 +329,6 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
   divider, "До скорой встречи!" in Great Vibes, and underneath it, quietly, "Сделано с любовью" — with no name or brand
   on it, like you asked. Change the wording in `closing.html` if you would like something else.
 
-**Step 12 – the music** (`src/app/background-music/`)
-
-- "Ambient Piano" by AtlasAudio: a quiet instrumental piece (piano over a soft pad, no words), chosen from Pixabay's
-  library of music that is free to use, including here, without asking anyone or naming them (the
-  [Pixabay Content License](https://pixabay.com/service/license-summary/)). It starts the moment the envelope has
-  (almost) finished opening — the same moment the page itself appears — and loops for as long as a guest stays on the
-  page. A small round button in the corner (bottom right) is the only way to stop it; browsers require *some* way to
-  silence sound that starts on its own, so this one small addition was necessary, not optional. Tap it again to bring
-  the music back; the choice is remembered for next time the same guest opens the page.
-- Made from the file kept in `tools/music-assets/` (the untouched original, and `make_assets.py`, which halves its
-  size for the web without an audible difference through a phone speaker) into `public/media/background-music.mp3`
-  (2.9 MB, downloaded once).
-- Sound cannot start on its own until a guest has touched the page once — the same rule the envelope's own video
-  already works around. It is tried three ways, in order: with sound; if that is refused, silently, so it is at
-  least already playing; and the very first tap, click or key anywhere switches the sound on (exactly like the
-  envelope), so nearly every guest hears it within a second or two of the page appearing, without ever being stuck
-  silent. The button reflects the truth at every moment — if the page is, right now, actually silent, it shows that.
-- To use a different piece of music, replace `tools/music-assets/source-ambient-piano.mp3` with another file and run
-  `python tools/music-assets/make_assets.py`. To change how loud it is, edit `VOLUME` in `background-music.ts`
-  (currently `0.4`, meant to sit under everything else rather than compete with it).
-
 ## The video files (`public/media/`)
 
 `envelope.mp4` is built from your watermark-free export `wm_free_cover.mp4`:

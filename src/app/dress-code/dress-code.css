@@ -149,6 +149,22 @@
     0 16px 20px -14px rgb(84 15 8 / 0.65);
 }
 
+/*
+ * The cream swatch is always last. That same glossy highlight every other circle gets (a 32%-white radial gradient,
+ * fine on darker colours) washes an already-pale colour out toward plain white - which is exactly the "it still
+ * looks white" complaint. Cut its own highlight and inner rim right back so its true colour - see --c on this
+ * swatch in dress-code.ts - actually reads as cream once rendered, not lightened further on top of that.
+ */
+.shade:last-child .dot {
+  background:
+    radial-gradient(circle at 30% 24%, rgb(255 255 255 / 0.1), rgb(255 255 255 / 0) 54%),
+    var(--c);
+  box-shadow:
+    0 0 0 1px rgb(84 15 8 / 0.3),
+    inset 0 -8px 12px -8px rgb(0 0 0 / 0.3),
+    0 16px 20px -14px rgb(84 15 8 / 0.65);
+}
+
 .tag {
   margin-top: 10px;
   font-family: var(--font-serif);

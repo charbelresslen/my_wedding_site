@@ -9,7 +9,10 @@ interface Shade {
 
 /**
  * The palette. The first four are the user's own circles (their colours were read from the picture they sent); black
- * and the colour of the page itself (`--bg` in styles.css) were added at their request. Change colours and names here.
+ * and cream were added at their request. The cream one is `--paper` (styles.css) - the site's ivory tone, not `--bg`
+ * (the page background itself, paler still): at --bg it read as plain white once rendered as a small circle, even
+ * with its own highlight cut back below (see .shade:last-child in dress-code.css) - --paper is visibly warmer/darker
+ * and reads unmistakably as cream instead. Change colours and names here.
  */
 const SHADES: Shade[] = [
   { name: 'Бордо', color: '#540f08' },
@@ -17,7 +20,7 @@ const SHADES: Shade[] = [
   { name: 'Мокко', color: '#8d6752' },
   { name: 'Пудровый', color: '#cf9f9d' },
   { name: 'Чёрный', color: '#161312' },
-  { name: 'Кремовый', color: 'var(--bg)' },
+  { name: 'Кремовый', color: 'var(--paper)' },
 ];
 
 /**

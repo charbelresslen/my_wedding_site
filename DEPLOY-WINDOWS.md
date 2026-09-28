@@ -134,7 +134,7 @@ copied over (e.g. `C:\wedding-site\dist\wedding-site\browser`), give it a **bind
 HTTPS is set up) with the domain's **host name** filled in, once the domain's DNS **A record** points at this VM's
 address.
 
-### 4. Tell IIS about the pictures, the font, the video and the music, and about `/api/`
+### 4. Tell IIS about the pictures, the font and the video, and about `/api/`
 
 Angular's build does not add a Windows-specific config file, so IIS needs one dropped into the site's folder. Save
 this as `web.config`, next to `index.html` (i.e. inside `browser`, so it also survives the next `npm run build` +
@@ -149,8 +149,6 @@ re-copy as long as you copy this file across again too, or keep a copy of it out
       <mimeMap fileExtension=".webp" mimeType="image/webp" />
       <remove fileExtension=".woff2" />
       <mimeMap fileExtension=".woff2" mimeType="font/woff2" />
-      <remove fileExtension=".mp3" />
-      <mimeMap fileExtension=".mp3" mimeType="audio/mpeg" />
       <remove fileExtension=".mp4" />
       <mimeMap fileExtension=".mp4" mimeType="video/mp4" />
     </staticContent>
@@ -178,7 +176,7 @@ re-copy as long as you copy this file across again too, or keep a copy of it out
 ```
 
 (`<remove>` before every `<mimeMap>` avoids an error if that extension already happens to be registered on this
-particular Windows/IIS version — some of the four already are, some are not, and it is safer not to guess which.)
+particular Windows/IIS version — some of the three already are, some are not, and it is safer not to guess which.)
 
 Start the API the same way as the quick path's step 5 (NSSM) — IIS forwards to it, but does not run it.
 
