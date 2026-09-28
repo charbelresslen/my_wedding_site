@@ -40,15 +40,14 @@ describe('DressCode', () => {
       { name: 'Мокко', color: '#8d6752' },
       { name: 'Пудровый', color: '#cf9f9d' },
       { name: 'Чёрный', color: '#161312' },
-      { name: 'Кремовый', color: 'var(--paper)' },
+      { name: 'Кремовый', color: '#e8cbb1' },
     ]);
   });
 
-  it('makes the last circle the site\'s ivory tone, not plain white', () => {
+  it('makes the last circle exactly the last woman\'s real dress colour, not an invented one', () => {
     const el: HTMLElement = create().nativeElement;
     const last = [...el.querySelectorAll<HTMLElement>('.dot')].pop()!;
-    // --paper in src/styles.css
-    expect(last.style.getPropertyValue('--c')).toBe('var(--paper)');
+    expect(last.style.getPropertyValue('--c')).toBe('#e8cbb1');
   });
 
   it('names the palette in words for screen readers, and hides the circles themselves', () => {

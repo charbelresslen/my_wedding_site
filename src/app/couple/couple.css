@@ -50,7 +50,11 @@
   position: relative;
   width: min(100%, 400px);
   margin: clamp(46px, 11vw, 60px) auto 0;
-  padding: 9% 9% 13%;
+  /* Asymmetric on purpose: less room on the left, more on the right, so the bigger photo (which sits flush against
+     its own left edge, see .polaroid-a) can start further left - closer to Anna's own side of it - while still
+     landing fully inside this padding, never past the frame drawn by the box-shadow below. The extra room freed up
+     on the right is exactly where the smaller photo sits anyway. */
+  padding: 9% 15% 13% 3%;
   background: linear-gradient(175deg, #fdf7ee 0%, #f6ead9 100%);
   /* a thin double line, like a picture frame's mat, drawn without extra elements */
   box-shadow:
@@ -71,11 +75,10 @@
 .polaroid-a {
   position: relative;
   z-index: 0;
-  width: 84%;
-  /* pushed left past the board's own left padding (not just flush with it): Anna, on the right side of this photo,
-     otherwise sits almost exactly where the smaller photo taped over the corner covers it - shifting the whole
-     photo further left moves her out from under that overlap instead. */
-  margin-inline: -15% auto;
+  width: 78%;
+  /* flush against the board's own (asymmetric, see .board) left padding - the most room this photo can have on that
+     side while still landing fully inside the frame, not past it. */
+  margin-inline: 0 auto;
   padding: 3.6% 3.6% 12%;
   transform: rotate(-2.5deg);
 }
@@ -83,9 +86,13 @@
 .polaroid-b {
   position: absolute;
   z-index: 1;
-  width: 52%;
-  right: -2%;
-  bottom: -9%;
+  /* right/bottom are a real inset, not just past-zero: this photo is TALLER than it is wide, so its own 5deg
+     rotation swings its corners out noticeably further than its unrotated box would suggest - a small inset here
+     still let a rotated corner cross the frame. Checked against the actual rendered (rotated) bounding box in the
+     browser, not just eyeballed from these numbers. */
+  width: 46%;
+  right: 3%;
+  bottom: 8%;
   padding: 3.2% 3.2% 11%;
   transform: rotate(5deg);
 }

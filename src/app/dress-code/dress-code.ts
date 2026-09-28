@@ -9,10 +9,13 @@ interface Shade {
 
 /**
  * The palette. The first four are the user's own circles (their colours were read from the picture they sent); black
- * and cream were added at their request. The cream one is `--paper` (styles.css) - the site's ivory tone, not `--bg`
- * (the page background itself, paler still): at --bg it read as plain white once rendered as a small circle, even
- * with its own highlight cut back below (see .shade:last-child in dress-code.css) - --paper is visibly warmer/darker
- * and reads unmistakably as cream instead. Change colours and names here.
+ * and cream were added at their request. Cream (`#e8cbb1`) is sampled directly from the last woman's actual dress in
+ * source-people.webp (see the bottom of tools/dresscode-assets/make_assets.py) - it is NOT recoloured to match this
+ * swatch (an earlier version did that backwards: picked a colour first, then multiply-blended the real photo towards
+ * it, which just made the dress in the picture look like a different, wrong colour from the swatch next to it). If
+ * source-people.webp is ever replaced, re-run make_assets.py and paste its printed "cream swatch colour" in here.
+ * Site tokens (--bg/--paper) were tried first too and both read as pale grey once rendered this small. Change
+ * colours and names here.
  */
 const SHADES: Shade[] = [
   { name: 'Бордо', color: '#540f08' },
@@ -20,7 +23,7 @@ const SHADES: Shade[] = [
   { name: 'Мокко', color: '#8d6752' },
   { name: 'Пудровый', color: '#cf9f9d' },
   { name: 'Чёрный', color: '#161312' },
-  { name: 'Кремовый', color: 'var(--paper)' },
+  { name: 'Кремовый', color: '#e8cbb1' },
 ];
 
 /**
