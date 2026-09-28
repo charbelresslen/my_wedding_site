@@ -6,13 +6,15 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "export": "node export-rsvp.js"
+    "export:excel": "node export-rsvp.js",
+    "export:pdf": "node export-rsvp-pdf.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "exceljs": "^4.4.0",
     "express": "^4.21.2",
-    "mysql2": "^3.11.5"
+    "mysql2": "^3.11.5",
+    "puppeteer": "^25.12.0"
   }
 }

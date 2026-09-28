@@ -3,3 +3,4 @@ node_modules/
 
 # Generated guest-list exports (real names/choices - never belong in the repo)
 rsvp-export-*.xlsx
+rsvp-export-*.pdf
