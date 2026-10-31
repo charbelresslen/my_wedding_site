@@ -18,11 +18,11 @@ describe('GiftSection', () => {
     expect(say(el.querySelector('h2'))).toBe('Пожелания');
   });
 
-  it("has the three wishes, in the couple's own words, one after the other", () => {
+  it("has the four wishes, in the couple's own words, one after the other", () => {
     const el: HTMLElement = create().nativeElement;
     const texts = [...el.querySelectorAll('.text')].map((t) => say(t)!);
 
-    expect(texts.length).toBe(3);
+    expect(texts.length).toBe(4);
     expect(texts[0]).toBe(
       'Дорогие родные и близкие, если хотите подарить нам ценный и нужный подарок, мы будем очень благодарны за вклад в бюджет нашей молодой семьи.',
     );
@@ -30,13 +30,14 @@ describe('GiftSection', () => {
       'Вместо мимолётной радости от букета цветов, мы бы хотели испытать свою удачу и с теплом вспоминать вас в то время, когда будем зачёркивать числа на лотерейных билетах. Вдруг нам повезёт!',
     );
     expect(texts[2]).toContain('Если вы планируете подготовить творческое поздравление, пожалуйста, сообщите об этом нашему ведущему:');
+    expect(texts[3]).toBe('Если вы захотите принять участие в свадебных аукционах, рекомендуем захватить с собой немного бумажных наличных');
   });
 
   it('separates the wishes with an ornament (the "***"), not with literal asterisks', () => {
     const el: HTMLElement = create().nativeElement;
     const writing = [...el.querySelector('.writing')!.children].map((c) => (c.classList.contains('sep') ? 'sep' : c.tagName.toLowerCase()));
 
-    expect(writing).toEqual(['h2', 'img', 'p', 'sep', 'p', 'sep', 'p']);
+    expect(writing).toEqual(['h2', 'img', 'p', 'sep', 'p', 'sep', 'p', 'sep', 'p']);
     for (const sep of el.querySelectorAll('.sep')) expect(sep.getAttribute('aria-hidden')).toBe('true');
     expect(el.textContent).not.toContain('*');
   });

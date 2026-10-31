@@ -5,7 +5,7 @@ export const ASSET_FINGERPRINTS: Readonly<Record<string, string>> = {
   'media/couple-beach.webp': '151872:c1967d7b',
   'media/couple-dinner.webp': '257062:cf40e549',
   'media/divider.webp': '59872:b76a59b0',
-  'media/dress-people.webp': '160332:fb009ff0',
+  'media/dress-people.webp': '162122:111d003e',
   'media/envelope-poster.jpg': '127450:741c3b5a',
   'media/flower-left.webp': '48348:afe80fd6',
   'media/flower-right.webp': '51746:47cf6bf9',

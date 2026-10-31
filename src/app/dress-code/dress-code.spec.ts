@@ -26,7 +26,8 @@ describe('DressCode', () => {
     const el: HTMLElement = create().nativeElement;
     const hint = el.querySelector('.hint')!;
 
-    expect(hint.textContent?.replace(/\s+/g, ' ').trim()).toBe(
+    expect(hint.querySelectorAll('.line').length).toBe(2); // exactly two lines
+    expect([...hint.querySelectorAll('.line')].map((l) => l.textContent).join(' ').replace(/[\s ]+/g, ' ')).toBe(
       '(Не обязательно полностью одеваться в цветовую палитру, достаточно будет одного элемента в одежде по желанию)',
     );
     // after the circles, not before

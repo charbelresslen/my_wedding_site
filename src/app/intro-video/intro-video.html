@@ -1,3 +1,7 @@
+@if (wide()) {
+  <canvas #ambient class="ambient" aria-hidden="true"></canvas>
+}
+
 <div class="stage">
   <video
     #video
@@ -9,6 +13,7 @@
     controlslist="nodownload noremoteplayback nofullscreen"
     tabindex="-1"
     aria-hidden="true"
+    (loadeddata)="paintAmbient()"
     (playing)="onPlaying()"
     (pause)="onPause()"
     (ended)="startFade()"
@@ -31,8 +36,9 @@
     />
   }
 
-  @if (phase() === 'loading') {
-    <!-- Fades in only after a moment, so a fast load never flashes it. -->
+  @if (phase() === 'loading' || (phase() === 'playing' && buffering())) {
+    <!-- Fades in only after a moment, so a fast load never flashes it. (Also shown when the video, once started, has
+         to wait for its data.) -->
     <span class="caption wait" lang="ru" role="status">Загрузка…</span>
   } @else if (phase() === 'ready') {
     <!-- Invisible tap target with a caption prompt: opening the envelope always needs this real tap, so the guest

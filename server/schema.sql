@@ -1,5 +1,5 @@
 -- The RSVP database: who is coming, whether they come only to the ZAGS ceremony or stay for the banquet too, their one
--- drink preference and, for the banquet, one dish chosen from each menu category (menu content: "Примерное меню 30 ч.pdf").
+-- drink preference and, for the banquet, one dish chosen from each menu category (salads, hot starters, main courses).
 --
 -- Run this once, as an account that can create databases and users (for example root), before the API server (in this
 -- same folder) is started for the first time:
@@ -49,11 +49,12 @@ CREATE TABLE IF NOT EXISTS food_categories (
   sort_order TINYINT UNSIGNED NOT NULL
 ) ENGINE=InnoDB;
 
+-- The final menu (agreed with the restaurant on 2026-10-31): one dish from each of these three categories. A database
+-- that was created earlier, with the first menu, is brought up to date by menu-update-2026-10-31.sql.
 INSERT INTO food_categories (id, name_ru, sort_order) VALUES
-  (1, 'Аперитив',          1),
-  (2, 'Холодные закуски',  2),
-  (3, 'Хлеб',              3),
-  (4, 'Салаты',            4)
+  (4, 'Салаты',           1),
+  (5, 'Горячие закуски',  2),
+  (6, 'Горячее',          3)
 ON DUPLICATE KEY UPDATE name_ru = VALUES(name_ru), sort_order = VALUES(sort_order);
 
 CREATE TABLE IF NOT EXISTS food_items (
@@ -65,27 +66,18 @@ CREATE TABLE IF NOT EXISTS food_items (
 ) ENGINE=InnoDB;
 
 INSERT INTO food_items (id, category_id, name_ru, sort_order) VALUES
-  -- Аперитив
-  (101, 1, 'Креветка со свежим огурцом',                 1),
-  (102, 1, 'Блинное канапе с сёмгой и маслинами',         2),
-  (103, 1, 'Ростбиф с корнишонами и жемчужным луком',     3),
-  (104, 1, 'Виноград с сыром',                            4),
-  -- Холодные закуски
-  (201, 2, 'Лосось слабосолёный с лимоном и маслинами',   1),
-  (202, 2, 'Филе слабосолёной сельди с молодым картофелем', 2),
-  (203, 2, 'Мясная тарелка',                              3),
-  (204, 2, 'Ассорти фермерских сыров',                    4),
-  (205, 2, 'Блинные рулетики с лососем и сливочным сыром', 5),
-  (206, 2, 'Ветчинные рулетики с сыром',                  6),
-  (207, 2, 'Рулетики из баклажанов с сыром и грецкими орехами', 7),
-  (208, 2, 'Профитроли с куриным паштетом',               8),
-  -- Хлеб
-  (301, 3, 'Ржаная булочка',                              1),
-  (302, 3, 'Пшеничная булочка',                           2),
   -- Салаты
-  (401, 4, 'Салат с ростбифом и печёным перцем',          1),
-  (402, 4, '«Мужской каприз»',                            2),
-  (403, 4, 'Греческий салат',                             3)
+  (404, 4, 'Цезарь с креветками',                                                   1),
+  (405, 4, 'Оливье с говядиной, перепелиным яйцом и красной икрой',                 2),
+  (406, 4, 'Салат с индейкой гриль, апельсинами и авокадо в цитрусовой заправке',   3),
+  (403, 4, 'Салат Греческий',                                                       4),
+  -- Горячие закуски
+  (501, 5, 'Оладьи из цукини с томатной сальсой и сметанным соусом',                1),
+  (502, 5, 'Жюльен из куриной грудки',                                              2),
+  -- Горячее
+  (601, 6, 'Медальоны из говядины с поджаркой из белых грибов и молодого картофеля с соусом порто', 1),
+  (602, 6, 'Куриная грудка в соусе терияки с миндалем и зелёными овощами',          2),
+  (603, 6, 'Стейк лосося с овощами гриль в цитрусовом соусе',                       3)
 ON DUPLICATE KEY UPDATE name_ru = VALUES(name_ru), category_id = VALUES(category_id), sort_order = VALUES(sort_order);
 
 -- ============================================================================================= the RSVPs guests submit

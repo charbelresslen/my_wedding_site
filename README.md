@@ -45,9 +45,14 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
 - The sealed-envelope poster is an image layered *above* the video and dissolves only once the video is
   really delivering frames, so nothing blank or bright can flash when playback starts.
 - ~1.4 s before the end the whole intro fades out to the main page (`src/app/home/`), which holds the sections below, one under the other.
-- The whole 1.6 MB video is downloaded into memory first, so it can never stall on the network.
-- The video is always shown whole (never cropped) and nothing is drawn over it. Spare screen area is the ivory
-  `--paper` colour (`src/styles.css`, used as `--backdrop` in `intro-video.css`).
+- The video streams from the start of the file (its index is at the front, see "The video files" below) and is watched
+  while it plays: if it freezes or never starts, the intro is given up and the invitation shows.
+- **The video fills the whole screen.** It keeps its 9:16 shape (never stretched) and is scaled until it covers the screen,
+  so no band of background colour is left beside it; what sticks out is cropped (a little off the sides of a tall phone,
+  a little off the top and bottom of a tablet). The seal and the caption are in the middle of the picture, so they stay in
+  view. On a landscape window (wider than 17:20) covering would blow the picture up three times, so there the whole video
+  is shown at the screen's height and the spare sides are painted from the video's own edge colours, softened, frame by
+  frame (`.ambient` canvas in `intro-video.*`). Nothing is drawn over the video.
 
 **Step 2 – the welcome section** (`src/app/hero/`)
 
@@ -155,7 +160,7 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
 - "Программа дня" in Great Vibes with your long ornamental separator under it, then a vertical timeline in the style of
   your reference: the pictures and times alternate left and right of a central rail with a small diamond marker at
   each step: **16:10 Сбор гостей в ЗАГСе** (a rose spray), **16:30 Торжественная церемония** (bride and groom),
-  **17:30 Встреча гостей в банкетном зале** (glasses in the arch), **18:30 Банкет** (the domed dish), **23:30 Завершение
+  **17:30 Встреча гостей в банкетном зале** (glasses in the arch), **18:00 Банкет** (the domed dish), **23:30 Завершение
   вечера** (entwined hearts). Times and wording are at the top of `timeline.ts`; the pictures are in
   `public/media/timeline-*.webp`. You had pictures for only three of the five steps, so the rose spray (`timeline-gathering`,
   the right bouquet of the bride-and-groom picture, mirrored so it has no cut edge) and the hearts (`timeline-finale`, the knot, leaves and curls from
@@ -243,10 +248,13 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
   дню!"**, **"Нам будет очень приятно, если вы поддержите стилистику нашей свадьбы и, по возможности, используете в ваших
   нарядах предложенные оттенки:"**, the circles, and in a smaller italic **"(Не обязательно полностью одеваться в цветовую
   палитру, достаточно будет одного элемента в одежде по желанию)"** (Anna's wording, in `dress-code.html`).
-- **The man in the brown suit is shown without his jacket and vest** (Anna's request): a white shirt with its sleeves, his tie
+- **The man in the brown suit is shown without his jacket and vest** (Anna's request): a white shirt with its sleeves, his tie (now black)
   carried down to a belt. Your picture has no such version and cannot be regenerated from here, so `shirtsleeves.py` (beside
   `make_assets.py`) paints it over your original, which is left untouched; the head, collar, cuffs, hands, trousers and all
-  the other guests are exactly yours. At phone size it reads naturally; if you would rather have a figure drawn by your
+  the other guests are exactly yours. His body is as wide as the suit's was (about 140 px of the 1672 px picture between
+  the sleeves, straight down to the belt — a narrower waist looked wrong), and his arms hang a hair away from it (hands in
+  his pockets), with a thin sliver of air that closes at the armpit and at the belt; the sleeves end in the cuffs of your
+  picture. At phone size it reads naturally; if you would rather have a figure drawn by your
   picture generator, replace `source-people.webp` with it and remove the `take_the_jacket_off` line in `make_assets.py`.
 - **The palette** is six circles drawn in CSS (no pictures): **Бордо** `#540f08`, **Шоколад** `#321b0d`, **Мокко** `#8d6752`,
   **Пудровый** `#cf9f9d` (the four colours read from your circles picture), then **Чёрный** `#161312` and **Кремовый**
@@ -263,7 +271,7 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
 
 **Step 10 – RSVP** (`src/app/rsvp/`, and the small server in `server/`)
 
-- A quiet card: "Подтверждение" in Great Vibes, your small divider, a sentence asking guests to confirm **by 30 November
+- A quiet card: "Подтверждение" in Great Vibes, your small divider, a sentence asking guests to confirm by filling in the form **by 7 December
   2026**, and an **RSVP** button (kept in Latin on purpose, like on your reference card — it is the one word of the site
   that is not Russian; say if you would rather it read "Подтвердить"). The button opens a form in a soft, blurred-backdrop
   dialog, closable with the × button, the Escape key or a tap outside it.
@@ -271,9 +279,10 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
   ЗАГСе** (ZAGS only). Guests staying only for the ceremony are done there: nothing else is asked of them, since the menu
   below does not concern them. Guests staying for the banquet also choose **one drink** (your list from the reference photo:
   8 kinds of champagne/wine, vodka, cognac, or "I don't drink alcohol", all translated to Russian) and **one dish from each
-  of 4 menu categories** — Аперитив, Холодные закуски, Хлеб, Салаты — read from "Примерное меню 30 ч.pdf". The two
-  single-item categories of that menu (the potato pancakes and the baked pork) are not asked about — with only one dish,
-  there is nothing to choose, so the caterer simply serves them to everyone; nothing is lost, and the form stays shorter.
+  of 3 menu categories** — Салаты (4 dishes), Горячие закуски (2) and Горячее (3). This is the final list agreed with the
+  restaurant on 31 October 2026; it replaced the first, longer one taken from "Примерное меню 30 ч.pdf" (Аперитив,
+  Холодные закуски, Хлеб and three other salads). Two names that were cut off in the message it came in were completed:
+  "…красной икрой" and "…в цитрусовой заправке"; the caterer's "куринной крудки" is spelled "куриной грудки".
   A ✓ press submits it; a quiet checkmark and "Спасибо, {имя}! Мы очень ждём встречи с вами." replace the form on success.
 - **Why there is a `server/` folder.** A guest's phone cannot write into a MySQL database directly — browsers are not
   allowed to speak the database's protocol, only HTTP. So a small Node server sits between the form and the database: it
@@ -286,6 +295,12 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
   `rsvp_food_choice` (one row per rsvp *and category*, so exactly one dish per category is possible, never two, never
   none). A view, `rsvp_overview`, lists every guest with their drink and dishes in one readable row — open it in MySQL
   Workbench (`SELECT * FROM rsvp_overview;`) whenever you want to see who is coming.
+- **A database made before 31 October 2026 still holds the first menu.** `server/schema.sql` seeds the final menu for a
+  brand-new database only; to bring an existing one (for example the one on your VM) up to date, open
+  `server/menu-update-2026-10-31.sql` in MySQL Workbench on that connection and press *Execute*. It is safe to run twice.
+  It removes the dishes and categories that are gone and, with them, every guest's answer to those dishes (the guest's
+  name, attendance and drink stay), so anyone who answered earlier has to choose again among the new categories. The
+  database on this computer has already been updated.
 - **To set it up (once):** you already have MySQL 8.0 and MySQL Workbench installed and running.
   1. Run `server/schema.sql` against your MySQL server as an account that can create databases — easiest is to open the
      file in MySQL Workbench (your existing "Local instance MySQL80" connection) and press the ⚡ *Execute* button. It only
@@ -312,7 +327,7 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
 - **"Пожелания"** (was "О подарках"; Anna sent her own wording, which replaced the earlier text) in Great Vibes with your small
   divider, written on **the wall** from your picture (`gift-wall.webp`, your transparent cut-out, 115 kB): the text sits on its
   big empty panel, between the carved corner ornaments, exactly like the text on the card of your reference.
-- **The words** (Russian, all in `gift.html`), three wishes with a small ornament (a diamond between two hairlines, for the
+- **The words** (Russian, all in `gift.html`), four wishes with a small ornament (a diamond between two hairlines, for the
   "***") between them:
   1. "Дорогие родные и близкие, если хотите подарить нам ценный и нужный подарок, мы будем очень благодарны за вклад в
      бюджет нашей молодой семьи."
@@ -320,6 +335,7 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
      когда будем зачёркивать числа на лотерейных билетах. Вдруг нам повезёт!"
   3. "Если вы планируете подготовить творческое поздравление, пожалуйста, сообщите об этом нашему ведущему: **Илья +7 908
      639 7561**" (the number is a link that calls from a phone, `tel:+79086397561`).
+  4. "Если вы захотите принять участие в свадебных аукционах, рекомендуем захватить с собой немного бумажных наличных"
 - **Layout:** the wall is drawn a little wider than a phone (about 470 px; the extra at the sides is cropped) so the panel is
   large enough to read; on a big screen the card is 640 px wide and the flowers overhang its corners a little (the stage does
   not clip them, so they stay whole; the extra of the wall on a phone is cropped by the section, which is as wide as the phone). Every size inside it is a fraction of the wall's width
@@ -370,6 +386,16 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
 
 `envelope-poster.jpg` is frame 0 of the video, converted with the same BT.709 maths a browser uses, so the
 poster and the video match colour for colour.
+
+**The index must be at the front.** The file that was in the project had its index (`moov`) at the *end*, so a browser
+that does not ask for the end of a file separately (the in-app browsers of Telegram and Max, and slow or filtered
+connections) never got to start it: the envelope stayed frozen. `tools/faststart.py` moves it to the front without
+re-encoding anything (`python tools/faststart.py public/media/envelope.mp4`; it does nothing if the file is already
+right). Run it whenever `envelope.mp4` is replaced by a file that did not come out of the `ffmpeg` command below.
+
+The page also watches the video (`intro-video.ts`): after the tap, if the picture has not started within 7 seconds, or
+stands still for 4.5 seconds once running, it gives the intro up and fades to the invitation instead of leaving the
+guest on a frozen envelope. A "Загрузка…" caption shows while a started video waits for its data.
 
 To redo both from a new export (`ffmpeg` is not installed system-wide):
 

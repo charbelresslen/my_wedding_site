@@ -45,8 +45,8 @@
 
 .writing {
   position: absolute;
-  left: 20%;
-  width: 60%;
+  left: 18.5%;
+  width: 63%;
   top: 19%;
   height: 61%;
   display: flex;
@@ -60,7 +60,7 @@
   margin: 0;
   font-family: var(--font-script);
   font-weight: 400;
-  font-size: 11.4cqw;
+  font-size: 11cqw;
   line-height: 1.05;
 }
 
@@ -68,10 +68,14 @@
   display: block;
   width: 21cqw;
   height: auto;
-  margin: 1cqw 0 3.2cqw;
+  margin: 0.6cqw 0 2.6cqw;
   opacity: 0.85;
   user-select: none;
   -webkit-user-drag: none;
+}
+
+.own-line {
+  display: block;
 }
 
 .text {
@@ -79,7 +83,7 @@
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 600;
-  font-size: 3.5cqw;
+  font-size: 3.4cqw;
   line-height: 1.36;
   text-wrap: balance;
 }
@@ -91,7 +95,7 @@
   flex: none;
   width: 15cqw;
   height: 1px;
-  margin: 3cqw 0;
+  margin: 2.4cqw 0;
   background: linear-gradient(to right, transparent, rgb(84 15 8 / 0.5) 22%, rgb(84 15 8 / 0.5) 78%, transparent);
 }
 

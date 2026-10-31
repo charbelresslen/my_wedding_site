@@ -15,7 +15,7 @@ describe('Timeline', () => {
     return fixture;
   }
 
-  it('lists the programme in order: guests gather 16:10, ceremony 16:30, guests meet in the hall 17:30, banquet 18:30, end 23:30', () => {
+  it('lists the programme in order: guests gather 16:10, ceremony 16:30, guests meet in the hall 17:30, banquet 18:00, end 23:30', () => {
     const el: HTMLElement = create().nativeElement;
 
     expect(el.querySelector('h2')?.textContent).toContain('Программа дня');
@@ -27,10 +27,10 @@ describe('Timeline', () => {
       { time: '16:10', label: 'Сбор гостей в ЗАГСе' },
       { time: '16:30', label: 'Торжественная церемония' },
       { time: '17:30', label: 'Встреча гостей в банкетном зале' },
-      { time: '18:30', label: 'Банкет' },
+      { time: '18:00', label: 'Банкет' },
       { time: '23:30', label: 'Завершение вечера' },
     ]);
-    expect([...el.querySelectorAll('time')].map((t) => t.getAttribute('datetime'))).toEqual(['16:10', '16:30', '17:30', '18:30', '23:30']);
+    expect([...el.querySelectorAll('time')].map((t) => t.getAttribute('datetime'))).toEqual(['16:10', '16:30', '17:30', '18:00', '23:30']);
   });
 
   it('puts the pictures on alternating sides', () => {

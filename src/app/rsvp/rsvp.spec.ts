@@ -67,10 +67,11 @@ describe('Rsvp', () => {
     fixture.detectChanges();
   }
 
-  it('shows the title and the 30 November 2026 deadline, with the dialog closed', () => {
+  it('shows the title and the 7 December 2026 deadline, with the dialog closed', () => {
     const el: HTMLElement = create().nativeElement;
     expect(say(el.querySelector('#rsvp-title'))).toBe('Подтверждение');
-    expect(say(el.querySelector('.lead'))).toContain('30 ноября 2026');
+    expect(say(el.querySelector('.lead'))).toContain('7 декабря 2026');
+    expect(say(el.querySelector('.lead'))).toContain('заполнив анкету');
     expect(el.querySelector('[role="dialog"]')).toBeNull();
   });
 
