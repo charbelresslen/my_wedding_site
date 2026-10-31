@@ -1,15 +1,36 @@
 :host {
   display: block;
+  padding: clamp(8px, 3vw, 20px) 16px clamp(20px, 6vw, 36px);
 }
 
+/* the whole section is one burgundy card with a fine light frame inside, everything on it in white */
 .countdown {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: clamp(28px, 8vw, 52px) 12px clamp(56px, 15vw, 100px);
+  width: min(100%, 520px);
+  margin-inline: auto;
+  padding: clamp(30px, 8vw, 44px) clamp(10px, 3vw, 20px) clamp(32px, 8.5vw, 46px);
   text-align: center;
-  color: var(--ink);
+  color: #fff;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.1), transparent 60%),
+    linear-gradient(160deg, #6e1a14 0%, var(--ink) 55%, #3b0b06 100%);
+  border-radius: clamp(22px, 6vw, 30px);
+  box-shadow:
+    0 18px 40px -16px rgba(84, 15, 8, 0.55),
+    0 2px 6px rgba(84, 15, 8, 0.25);
   overflow: clip;
+}
+
+.countdown::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: calc(clamp(22px, 6vw, 30px) - 8px);
+  pointer-events: none;
 }
 
 .title {
@@ -24,7 +45,9 @@
   display: block;
   width: clamp(96px, 29vw, 140px);
   height: auto;
-  margin: 4px 0 clamp(18px, 5vw, 30px);
+  margin: 4px 0 clamp(16px, 4.5vw, 26px);
+  filter: brightness(0) invert(1);
+  opacity: 0.85;
   user-select: none;
   -webkit-user-drag: none;
 }

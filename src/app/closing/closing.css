@@ -1,7 +1,7 @@
 :host {
   position: relative;
   display: block;
-  padding: clamp(40px, 11vw, 64px) 20px clamp(64px, 18vw, 104px);
+  padding: clamp(24px, 6vw, 36px) 20px clamp(44px, 12vw, 68px);
   overflow: clip;
   text-align: center;
   color: var(--ink);

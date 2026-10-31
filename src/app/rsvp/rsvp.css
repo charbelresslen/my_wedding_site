@@ -4,7 +4,7 @@
 
 .rsvp {
   position: relative;
-  padding: clamp(56px, 17vw, 100px) 0 clamp(72px, 20vw, 130px);
+  padding: clamp(28px, 7vw, 44px) 0 clamp(36px, 10vw, 60px);
   overflow: clip;
   color: var(--ink);
   text-align: center;

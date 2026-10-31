@@ -3,7 +3,7 @@
 }
 
 .timeline {
-  padding: clamp(40px, 11vw, 72px) 0 clamp(36px, 10vw, 64px);
+  padding: clamp(24px, 6vw, 36px) 0 clamp(20px, 5vw, 32px);
   overflow: clip;
   color: var(--ink);
 }

@@ -40,16 +40,16 @@ describe('LocationSection', () => {
     expect(hotel.querySelector('.address')?.nextElementSibling).toBe(hotel.querySelector('.hall'));
   });
 
-  it('shows a photo of each place (with a description) and a sprig of flowers on its corner, and the peony at the top', () => {
+  it('shows a photo of each place (with a description) and a sprig of flowers on its corner', () => {
     const el: HTMLElement = create().nativeElement;
     const photos = [...el.querySelectorAll<HTMLImageElement>('.photo')];
 
     expect(photos.map((p) => p.getAttribute('src'))).toEqual(['media/loc-zags.webp', 'media/loc-hotel.webp']);
     for (const photo of photos) expect(photo.alt.length).toBeGreaterThan(10);
     expect([...el.querySelectorAll('.sprig')].map((s) => s.getAttribute('src'))).toEqual(['media/loc-sprig.webp', 'media/loc-sprig.webp']);
-    expect(el.querySelector('.head .peony')?.getAttribute('src')).toBe('media/loc-peony.webp');
+    expect(el.querySelector('.peony')).toBeNull();
     // the flowers are decoration
-    for (const decoration of el.querySelectorAll('.sprig, .peony, .divider')) expect(decoration.getAttribute('aria-hidden')).toBe('true');
+    for (const decoration of el.querySelectorAll('.sprig, .divider')) expect(decoration.getAttribute('aria-hidden')).toBe('true');
   });
 
   it('puts a framed map with an "open in Yandex Maps" button under each photo', () => {

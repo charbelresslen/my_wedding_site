@@ -3,7 +3,7 @@
 }
 
 .gift {
-  padding: clamp(24px, 6vw, 48px) 0 clamp(40px, 10vw, 72px);
+  padding: clamp(12px, 4vw, 24px) 0 clamp(28px, 7vw, 44px);
   overflow: clip;
   color: var(--ink);
 }

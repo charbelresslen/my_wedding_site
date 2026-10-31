@@ -3,7 +3,7 @@
 }
 
 .couple {
-  padding: clamp(40px, 11vw, 68px) 0 clamp(72px, 19vw, 120px);
+  padding: clamp(24px, 6vw, 36px) 0 clamp(40px, 11vw, 64px);
   overflow: clip;
   color: var(--ink);
   text-align: center;

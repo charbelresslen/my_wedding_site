@@ -3,7 +3,7 @@
 }
 
 .place {
-  padding-bottom: clamp(64px, 18vw, 110px);
+  padding-bottom: clamp(24px, 7vw, 40px);
   overflow: clip;
   color: var(--ink);
   text-align: center;
@@ -19,7 +19,7 @@
 
 .head {
   position: relative;
-  padding: clamp(56px, 17vw, 100px) 16px 0;
+  padding: clamp(24px, 6vw, 36px) 16px 0;
 }
 
 .title {
@@ -36,20 +36,8 @@
   display: block;
   width: clamp(96px, 29vw, 140px);
   height: auto;
-  margin: 8px auto clamp(34px, 10vw, 54px);
+  margin: 8px auto clamp(22px, 6vw, 32px);
   opacity: 0.8;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-/* the big peony cluster at the top right of the section */
-.peony {
-  position: absolute;
-  top: 0;
-  right: -2%;
-  width: clamp(78px, 26vw, 150px);
-  height: auto;
-  pointer-events: none;
   user-select: none;
   -webkit-user-drag: none;
 }
@@ -57,7 +45,7 @@
 /* ================= a place ================= */
 
 .venue + .venue {
-  margin-top: clamp(64px, 18vw, 104px);
+  margin-top: clamp(32px, 9vw, 52px);
 }
 
 .who {
@@ -118,7 +106,7 @@
 /* the photo: the whole width, melting into the page at the top and the bottom (and at the sides on a big screen) */
 .shot {
   position: relative;
-  margin: clamp(22px, 6vw, 34px) 0 clamp(52px, 15vw, 68px);
+  margin: clamp(18px, 5vw, 28px) 0 clamp(36px, 10vw, 46px);
 }
 
 .photo-wrap {
@@ -172,14 +160,8 @@
     transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-.peony,
 .sprig {
   opacity: 0;
-}
-
-.peony {
-  transform: translate(6%, -4%) scale(0.92);
-  transform-origin: 100% 0;
 }
 
 .sprig {
@@ -187,7 +169,6 @@
   transform-origin: 0 100%;
 }
 
-.head.is-visible .peony,
 .shot.is-visible .sprig {
   opacity: 1;
   transform: none;
@@ -198,10 +179,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .reveal,
-  .peony,
   .sprig,
   .reveal.is-visible,
-  .head.is-visible .peony,
   .shot.is-visible .sprig {
     opacity: 1;
     transform: none;

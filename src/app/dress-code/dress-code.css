@@ -3,7 +3,7 @@
 }
 
 .dress {
-  padding: clamp(56px, 17vw, 100px) 0 clamp(64px, 18vw, 110px);
+  padding: clamp(28px, 7vw, 44px) 0 clamp(28px, 8vw, 44px);
   overflow: clip;
   color: var(--ink);
   text-align: center;
