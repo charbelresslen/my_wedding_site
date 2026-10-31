@@ -68,7 +68,7 @@
   display: block;
   width: 21cqw;
   height: auto;
-  margin: 1cqw 0 3.6cqw;
+  margin: 1cqw 0 3.2cqw;
   opacity: 0.85;
   user-select: none;
   -webkit-user-drag: none;
@@ -79,30 +79,43 @@
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 600;
-  font-size: 3.6cqw;
-  line-height: 1.42;
+  font-size: 3.5cqw;
+  line-height: 1.36;
   text-wrap: balance;
 }
 
-.text + .text {
-  margin-top: 3.2cqw;
-}
-
-.lead {
-  font-size: 3.9cqw;
-}
-
-.envelope {
+/* the "***" between the wishes: two hairlines and a small diamond */
+.sep {
   display: block;
-  width: 9cqw;
-  height: auto;
-  margin: 3.4cqw 0;
-  color: var(--ink);
-  opacity: 0.85;
+  position: relative;
+  flex: none;
+  width: 15cqw;
+  height: 1px;
+  margin: 3cqw 0;
+  background: linear-gradient(to right, transparent, rgb(84 15 8 / 0.5) 22%, rgb(84 15 8 / 0.5) 78%, transparent);
 }
 
-.envelope + .text {
-  margin-top: 0;
+.sep::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1.5cqw;
+  height: 1.5cqw;
+  background: var(--ink);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* the host's number: a link that calls from a phone, written like the rest, only underlined */
+.phone {
+  display: inline-block;
+  margin-top: 0.5cqw;
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  white-space: nowrap;
 }
 
 /* ================= entrance (when the section scrolls into view) ================= */
@@ -133,28 +146,8 @@
   opacity: 0.85;
 }
 
-:host(.is-visible) .title {
-  transition-delay: 0.4s;
-}
-
-:host(.is-visible) .divider {
-  transition-delay: 0.6s;
-}
-
-:host(.is-visible) .lead {
-  transition-delay: 0.8s;
-}
-
-:host(.is-visible) .lead + .text {
-  transition-delay: 1s;
-}
-
-:host(.is-visible) .envelope {
-  transition-delay: 1.2s;
-}
-
-:host(.is-visible) .envelope + .text {
-  transition-delay: 1.4s;
+:host(.is-visible) .writing .reveal {
+  transition-delay: calc(0.4s + var(--n, 0) * 0.17s);
 }
 
 @media (prefers-reduced-motion: reduce) {

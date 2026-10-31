@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { revealOnView } from '../shared/reveal-on-view';
+import { SafeImg } from '../shared/safe-img';
 
 /**
  * Step 11: the very last thing a guest sees - a quiet closing line and, underneath it, "Сделано с любовью" (made with
@@ -8,6 +9,7 @@ import { revealOnView } from '../shared/reveal-on-view';
  */
 @Component({
   selector: 'app-closing',
+  imports: [SafeImg],
   templateUrl: './closing.html',
   styleUrl: './closing.css',
   host: { '[class.is-visible]': 'visible()' },

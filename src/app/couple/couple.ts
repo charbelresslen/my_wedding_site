@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { revealParts } from '../shared/reveal-on-view';
+import { SafeImg } from '../shared/safe-img';
 
 /**
  * Step 4b: "Наша история" - the couple's own two photos, so guests who do not know them yet get a face to the names.
@@ -9,6 +10,7 @@ import { revealParts } from '../shared/reveal-on-view';
  */
 @Component({
   selector: 'app-couple',
+  imports: [SafeImg],
   templateUrl: './couple.html',
   styleUrl: './couple.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

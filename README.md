@@ -11,6 +11,20 @@ npm run build      # production build into dist/wedding-site
 npm test           # unit tests
 ```
 
+Before every `npm start`, `npm run build` and `npm test` a small script (`tools/make-asset-manifest.mjs`) rewrites
+`src/app/shared/asset-manifest.ts`: the size and checksum of every picture in `public/media`. If you build some other
+way (e.g. a bare `npx ng build`), run `npm run assets:manifest` first, and after changing any picture.
+
+**Pictures that arrive damaged.** From some places (it happened on Anna's other site, from Russia) a picture served
+over plain http comes out half-drawn or with strange colours, because the bytes are cut or rewritten on the way and the
+browser paints whatever arrived without any error. So no `<img>` of the site uses `src` for its pictures: it uses
+`safeSrc` (`src/app/shared/safe-img.ts`). That directive downloads the picture itself, compares its size and checksum
+with the recorded ones, shows it only if they match (otherwise it downloads again, up to six times, past the cache and
+from a different address each time) and, if every try fails, lets the browser load it plainly. Until a picture is
+verified it is invisible (`styles.css`). Left as they are: the envelope video and its poster (shown at once, they are
+the first thing a guest sees) and the Yandex map picture (not ours). Serving the site over **https** would stop this at
+the root; for now the check is what protects the pictures.
+
 > Use the project's own Angular (`npm start`, `npx ng ...`), not a globally installed `ng`.
 > Angular 21 needs Node 20.19+, 22.12+ or 24+.
 
@@ -37,7 +51,7 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
 
 **Step 2 – the welcome section** (`src/app/hero/`)
 
-- Layout: your photo, unframed and full width (edge to edge on phones), then "Добро пожаловать на свадьбу", a
+- Layout: your photo, unframed and full width (edge to edge on phones), then "Добро пожаловать на свадьбу" (in Great Vibes like the names, always one line and about 89% of the screen's width on a phone, `--i-kicker` in `hero.css`), a
   small soft divider, and the names "Шарбель & Анна" in Great Vibes between your two burgundy flower corners at the bottom. There is no "scroll down"
   cue any more; the room it used to take under the writing is kept (`--foot-h` in `hero.css`), so the writing stays
   exactly where it was.
@@ -101,10 +115,10 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
   the cream page at the top and bottom (and at the sides on a big screen, where the card is at most 640 px wide). On a
   narrow phone the wall is drawn a little wider than the screen (about 460 px, the extra is cropped at the sides) so the
   big panel the writing sits on is large enough to read.
-- Written on the panel, all burgundy: "Вы приглашены на церемонию бракосочетания" (small capitals), **Шарбель** and
-  **& Анна** on two lines in Great Vibes (like the first section), your small divider, "Дорогие родные и друзья" and "Будем счастливы разделить с вами день, с которого
-  начнётся наша семья." The wording is in `invitation.html`. There are no parents' names, place or time on it yet (not
-  given); the date is not repeated here (it has its own section above).
+- Written on the panel, all burgundy: **"Дорогие родные и друзья"** in Great Vibes, your small divider, and **"Мы будем
+  счастливы разделить с вами день, с которого начнётся наша семья!"** (the "Вы приглашены ..." line and the names above
+  were removed at Anna's request, and the lower text made the main one). The wording is in `invitation.html`. There are no
+  parents' names, place or time on it yet (not given); the date is not repeated here (it has its own section above).
 - The peony clusters (`peony-left.webp` / `peony-right.webp`) are your flower picture stood upright as in the reference
   card: the peony at the bottom, its leaf pointing to the middle of the card and the stems rising along the outer edge
   (your picture lies on its side, so it is mirrored and turned about 98 degrees counter-clockwise for the left corner;
@@ -119,10 +133,11 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
 
 **Step 4b – "Наша история"** (`src/app/couple/`)
 
-- Your own two photos, right after the invitation, so a guest who has never met you both gets a face to the names: "Наша
-  история" in Great Vibes, your small divider, one sentence ("Мы благодарны судьбе за каждый день, что привёл нас друг к
-  другу, — и с трепетом ждём дня, когда мы официально станем одной семьёй." — say if you would like different wording),
-  then the two pictures, on a small vintage board: a thin double line like a picture frame's mat, a soft aged-paper
+- Your own two photos, right after the invitation, so a guest who has never met you both gets a face to the names: your
+  small divider, one sentence in a larger italic ("Мы благодарны судьбе за каждый день, что привёл нас друг к другу, и
+  с трепетом ждём дня, когда мы официально станем одной семьёй."), the **same divider again under it**, then the two
+  pictures. The title "Наша история" is no longer shown (Anna's request); it stays in the page for screen readers.
+  The pictures are on a small vintage board: a thin double line like a picture frame's mat, a soft aged-paper
   background, and the two photos printed with a plain white border like real prints, each held down with a strip of
   washi tape at an angle — nothing drawn over the pictures themselves and nothing cropped in a way that hides anything.
   The dinner picture is the larger print, sitting straight-ish; the picture by the sea is the smaller one, tilted,
@@ -139,9 +154,15 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
 
 - "Программа дня" in Great Vibes with your long ornamental separator under it, then a vertical timeline in the style of
   your reference: the pictures and times alternate left and right of a central rail with a small diamond marker at
-  each step. **16:00 Прибытие в ЗАГС** (bride and groom), **18:00 Приветственный напиток** (glasses in the arch),
-  **19:00 Банкетный ужин** (the domed dish). Times and wording are at the top of `timeline.ts`; the pictures are in
-  `public/media/timeline-*.webp`.
+  each step: **16:10 Сбор гостей в ЗАГСе** (a rose spray), **16:30 Торжественная церемония** (bride and groom),
+  **17:30 Встреча гостей в банкетном зале** (glasses in the arch), **18:30 Банкет** (the domed dish), **23:30 Завершение
+  вечера** (entwined hearts). Times and wording are at the top of `timeline.ts`; the pictures are in
+  `public/media/timeline-*.webp`. You had pictures for only three of the five steps, so the rose spray (`timeline-gathering`,
+  the right bouquet of the bride-and-groom picture, mirrored so it has no cut edge) and the hearts (`timeline-finale`, the knot, leaves and curls from
+  the foot of the arch picture; the scroll bands running off to the sides are cut away so it ends on its own leaves and
+  curls, with the two upper ribbon ends rounded off and no fading) are cut from yours by `make_assets.py`; if you make two pictures
+  of your own for those steps, put them in as `source-*.webp` and swap them in `timeline.ts` (`size` draws a tall or small
+  picture at a fraction of the usual width).
 - The rail is your two sticks: the finial of the first stick at the top, the finial of the last stick at the bottom and
   a plain piece of rod stretched between them (all cut from the same columns of your pictures, so they line up).
 - The burgundy flower rides the rail as you scroll. It waits at the first marker, slides down in step with the scroll
@@ -166,9 +187,9 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
 - The digits stand upright. Great Vibes leans to the right, so the digits are skewed back by 21 degrees (`skewX(21deg)`
   on an inner `.ink` element, the average lean of its digits measured on the rendered glyphs); that keeps their weight
   but makes them narrower and stops them leaning into their neighbours.
-- The moment it counts down to is at the top of `countdown.ts` (`CELEBRATION`): **19 December 2026, 16:00** (the arrival
-  at the ZAGS in the programme), read as the guest's own local time. To pin it to the venue's time zone whatever the
-  guest's is, give it an offset, e.g. `'2026-12-19T16:00:00+03:00'`. When the time comes the title turns into
+- The moment it counts down to is at the top of `countdown.ts` (`CELEBRATION`): **19 December 2026, 16:30** (the ceremony in
+  the programme; the guests gather from 16:10), read as the guest's own local time. To pin it to the venue's time zone
+  whatever the guest's is, give it an offset, e.g. `'2026-12-19T16:30:00+05:00'` (Yekaterinburg). When the time comes the title turns into
   "Торжество началось" and the clock stops at 00 : 00 : 00.
 - The clock ticks on the second straight from the device clock (it cannot drift), only while the section is near the
   screen and the tab is in front; it catches up at once when you come back. Screen readers are given one calm sentence
@@ -218,11 +239,18 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
 - "Дресс-код" in Great Vibes with your small divider, then your picture of the guests in the palette (`dress-people.webp`,
   your transparent cut-out trimmed to the figures and shrunk to 1200 px, 176 kB, with a soft shadow on the floor under their
   feet; it stands inside the screen with a margin on each side, so the guests at the two ends do not touch the screen's
-  edge; on a big screen its very ends also melt away in a light fade), then the invitation in the style of your
-  reference: "Мы будем рады видеть вас" in italics and **"в нарядах этих оттенков"** in the script, and under it the palette.
+  edge; on a big screen its very ends also melt away in a light fade), then the words, then the palette, then the small print under the circles: **"Мы трепетно готовимся к нашему незабываемому
+  дню!"**, **"Нам будет очень приятно, если вы поддержите стилистику нашей свадьбы и, по возможности, используете в ваших
+  нарядах предложенные оттенки:"**, the circles, and in a smaller italic **"(Не обязательно полностью одеваться в цветовую
+  палитру, достаточно будет одного элемента в одежде по желанию)"** (Anna's wording, in `dress-code.html`).
+- **The man in the brown suit is shown without his jacket and vest** (Anna's request): a white shirt with its sleeves, his tie
+  carried down to a belt. Your picture has no such version and cannot be regenerated from here, so `shirtsleeves.py` (beside
+  `make_assets.py`) paints it over your original, which is left untouched; the head, collar, cuffs, hands, trousers and all
+  the other guests are exactly yours. At phone size it reads naturally; if you would rather have a figure drawn by your
+  picture generator, replace `source-people.webp` with it and remove the `take_the_jacket_off` line in `make_assets.py`.
 - **The palette** is six circles drawn in CSS (no pictures): **Бордо** `#540f08`, **Шоколад** `#321b0d`, **Мокко** `#8d6752`,
-  **Пудровый** `#cf9f9d` (the four colours read from your circles picture), then **Чёрный** `#161312` and **Молочный**
-  `#fdf4eb`, exactly the colour of the site's background (`--bg`), added at your request. Each circle has its colour, a soft
+  **Пудровый** `#cf9f9d` (the four colours read from your circles picture), then **Чёрный** `#161312` and **Кремовый**
+  `#e8cbb1`, sampled from the last woman's own dress in the picture (not recoloured to match it), added at your request. Each circle has its colour, a soft
   light from the top left, an inner ring, a hairline outer ring (so the cream one shows on the cream page) and a shadow,
   and its name in small italics under it. Six in a row (three and three on a very narrow phone); all sizes come from the
   width of the column in plain lengths, so they cannot drift between browsers. Colours and names are in `SHADES` at the top
@@ -281,17 +309,17 @@ Ready to put it online for real guests? See **[DEPLOY.md](DEPLOY.md)** (a Linux 
 
 **Step 9 – the gifts** (`src/app/gift/`)
 
-- "О подарках" in Great Vibes with your small divider, written on **the wall** from your picture (`gift-wall.webp`, your
-  transparent cut-out, 115 kB): the text sits on its big empty panel, between the carved corner ornaments, exactly like the
-  text on the card of your reference. A **burgundy flower cluster at the top-left and one at the bottom-right** (your two
-  flower pictures, `gift-flower-tl.webp` / `gift-flower-br.webp`, about 66 kB each) hug the corners of the visible screen.
-- **The flowers were cream and gold; they are recoloured to the site's burgundy** by `tools/gift-assets/make_assets.py`, with
-  the same recolour as every other flower of the site (see "All the flowers are burgundy" below).
-- **The words** (Russian, all in `gift.html`; the "kids" paragraph of the reference is left out, as you asked):
-  1. "Лучшая поддержка для нас — ваша любовь, ваши молитвы и ваше присутствие рядом."
-  2. "Если захотите порадовать нас подарком, мы будем тронуты конвертом: пусть он станет вашим вкладом в нашу молодую семью."
-  3. (under a small drawn envelope with a heart, where the reference has its "gift list" link) "А вместо букетов мы с радостью
-     примем лотерейные билеты: цветы завянут, а вдруг нам повезёт!"
+- **"Пожелания"** (was "О подарках"; Anna sent her own wording, which replaced the earlier text) in Great Vibes with your small
+  divider, written on **the wall** from your picture (`gift-wall.webp`, your transparent cut-out, 115 kB): the text sits on its
+  big empty panel, between the carved corner ornaments, exactly like the text on the card of your reference.
+- **The words** (Russian, all in `gift.html`), three wishes with a small ornament (a diamond between two hairlines, for the
+  "***") between them:
+  1. "Дорогие родные и близкие, если хотите подарить нам ценный и нужный подарок, мы будем очень благодарны за вклад в
+     бюджет нашей молодой семьи."
+  2. "Вместо мимолётной радости от букета цветов, мы бы хотели испытать свою удачу и с теплом вспоминать вас в то время,
+     когда будем зачёркивать числа на лотерейных билетах. Вдруг нам повезёт!"
+  3. "Если вы планируете подготовить творческое поздравление, пожалуйста, сообщите об этом нашему ведущему: **Илья +7 908
+     639 7561**" (the number is a link that calls from a phone, `tel:+79086397561`).
 - **Layout:** the wall is drawn a little wider than a phone (about 470 px; the extra at the sides is cropped) so the panel is
   large enough to read; on a big screen the card is 640 px wide and the flowers overhang its corners a little (the stage does
   not clip them, so they stay whole; the extra of the wall on a phone is cropped by the section, which is as wide as the phone). Every size inside it is a fraction of the wall's width

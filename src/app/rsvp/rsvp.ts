@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { timeout } from 'rxjs';
 import { revealParts } from '../shared/reveal-on-view';
+import { SafeImg } from '../shared/safe-img';
 
 /** How long to wait for the menu before giving up and showing the error state — otherwise a firewalled or
  *  unreachable API (see API_BASE below) leaves the guest looking at "Загружаем меню…" forever. */
@@ -67,6 +68,7 @@ function friendlyError(code: unknown): string {
  */
 @Component({
   selector: 'app-rsvp',
+  imports: [SafeImg],
   templateUrl: './rsvp.html',
   styleUrl: './rsvp.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -31,6 +31,15 @@ describe('LocationSection', () => {
     ]);
   });
 
+  it('names the banquet hall on its own line under the hotel address (the ceremony has no hall line)', () => {
+    const el: HTMLElement = create().nativeElement;
+    const [zags, hotel] = [...el.querySelectorAll('.venue')];
+
+    expect(zags.querySelector('.hall')).toBeNull();
+    expect(hotel.querySelector('.hall')?.textContent?.trim()).toBe('Банкетный зал Кейс');
+    expect(hotel.querySelector('.address')?.nextElementSibling).toBe(hotel.querySelector('.hall'));
+  });
+
   it('shows a photo of each place (with a description) and a sprig of flowers on its corner, and the peony at the top', () => {
     const el: HTMLElement = create().nativeElement;
     const photos = [...el.querySelectorAll<HTMLImageElement>('.photo')];

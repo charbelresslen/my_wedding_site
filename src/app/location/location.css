@@ -105,6 +105,16 @@
   opacity: 0.9;
 }
 
+/* the hall, one line under the address: the same hand as the address, a little warmer */
+.hall {
+  margin: 6px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(18px, 5vw, 21px);
+  line-height: 1.25;
+}
+
 /* the photo: the whole width, melting into the page at the top and the bottom (and at the sides on a big screen) */
 .shot {
   position: relative;

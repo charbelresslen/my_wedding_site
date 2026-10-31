@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRender, inject } from '@angular/core';
 import { revealOnView, revealParts } from '../shared/reveal-on-view';
+import { SafeImg } from '../shared/safe-img';
 
 interface Step {
   /** as printed and for the <time> element */
@@ -9,13 +10,17 @@ interface Step {
   /** the picture's real pixel size (keeps the layout from jumping while it loads) */
   width: number;
   height: number;
+  /** how big the picture is drawn, as a fraction of the usual width (tall or small pictures are drawn smaller) */
+  size?: number;
 }
 
 /** The programme of the day. Change times and wording here. */
 const STEPS: Step[] = [
-  { time: '16:00', label: 'Прибытие в ЗАГС', art: 'media/timeline-arrival.webp', width: 560, height: 546 },
-  { time: '18:00', label: 'Приветственный напиток', art: 'media/timeline-welcome.webp', width: 560, height: 560 },
-  { time: '19:00', label: 'Банкетный ужин', art: 'media/timeline-banquet.webp', width: 560, height: 392 },
+  { time: '16:10', label: 'Сбор гостей в ЗАГСе', art: 'media/timeline-gathering.webp', width: 330, height: 605, size: 0.36 },
+  { time: '16:30', label: 'Торжественная церемония', art: 'media/timeline-arrival.webp', width: 560, height: 546 },
+  { time: '17:30', label: 'Встреча гостей в банкетном зале', art: 'media/timeline-welcome.webp', width: 560, height: 560 },
+  { time: '18:30', label: 'Банкет', art: 'media/timeline-banquet.webp', width: 560, height: 392 },
+  { time: '23:30', label: 'Завершение вечера', art: 'media/timeline-finale.webp', width: 283, height: 220, size: 0.6 },
 ];
 
 /**
@@ -38,6 +43,7 @@ const CATCH_UP = 0.2;
  */
 @Component({
   selector: 'app-timeline',
+  imports: [SafeImg],
   templateUrl: './timeline.html',
   styleUrl: './timeline.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

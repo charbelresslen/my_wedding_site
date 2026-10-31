@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRender, inject, signal } from '@angular/core';
 import { revealOnView } from '../shared/reveal-on-view';
 import { PetalShower } from './petal-shower';
+import { SafeImg } from '../shared/safe-img';
 
 /** The wedding date: 19 December 2026. Change it here; the calendar, the weekday and the sentence follow. */
 const WEDDING = { year: 2026, month: 12, day: 19 };
@@ -37,7 +38,7 @@ function buildMonth(): CalendarDay[] {
  */
 @Component({
   selector: 'app-date-section',
-  imports: [PetalShower],
+  imports: [PetalShower, SafeImg],
   templateUrl: './date-section.html',
   styleUrl: './date-section.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

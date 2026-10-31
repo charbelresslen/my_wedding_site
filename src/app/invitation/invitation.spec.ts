@@ -10,14 +10,20 @@ describe('Invitation', () => {
     return fixture;
   }
 
-  it('is written in Russian: the invitation line, both names and the closing words', () => {
+  it('is written in Russian: the greeting, then the sentence that starts with "Мы" and ends with "!"', () => {
     const el: HTMLElement = create().nativeElement;
 
-    expect(el.querySelector('.kicker')?.textContent).toContain('Вы приглашены на церемонию бракосочетания');
-    expect(el.querySelector('.name-1')?.textContent?.trim()).toBe('Шарбель');
-    expect(el.querySelector('.name-2')?.textContent).toContain('Анна');
-    expect(el.querySelector('.dear')?.textContent).toContain('Дорогие родные и друзья');
-    expect(el.querySelector('.note')?.textContent?.trim().length).toBeGreaterThan(20);
+    expect(el.querySelector('.dear')?.textContent?.trim()).toBe('Дорогие родные и друзья');
+    expect(el.querySelector('.note')?.textContent?.trim()).toBe(
+      'Мы будем счастливы разделить с вами день, с которого начнётся наша семья!',
+    );
+  });
+
+  it('no longer has the line "Вы приглашены ..." or the names above the greeting', () => {
+    const el: HTMLElement = create().nativeElement;
+
+    expect(el.textContent).not.toMatch(/приглашены|бракосочетани|Шарбель|Анна/);
+    expect(el.querySelector('.kicker, .names')).toBeNull();
   });
 
   it('does not repeat the wedding date (it has its own section above)', () => {
@@ -25,13 +31,11 @@ describe('Invitation', () => {
     expect(el.textContent).not.toMatch(/2026|декабр/i);
   });
 
-  it('has a heading that reads "Шарбель и Анна" to a screen reader (the "&" is only decoration)', () => {
+  it('is named by its greeting for a screen reader', () => {
     const el: HTMLElement = create().nativeElement;
     const heading = el.querySelector('h2') as HTMLElement;
 
-    expect(heading.textContent?.replace(/\s+/g, ' ').trim()).toBe('Шарбель &и Анна');
-    expect(heading.querySelector('.amp')?.getAttribute('aria-hidden')).toBe('true');
-    expect(heading.querySelector('.visually-hidden')?.textContent).toBe('и');
+    expect(heading.textContent?.trim()).toBe('Дорогие родные и друзья');
     expect(el.querySelector('section')?.getAttribute('aria-labelledby')).toBe(heading.id);
   });
 

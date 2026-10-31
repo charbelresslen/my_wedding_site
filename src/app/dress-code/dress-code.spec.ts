@@ -10,12 +10,27 @@ describe('DressCode', () => {
     return fixture;
   }
 
-  it('is titled "Дресс-код" and invites the guests to wear the shades below, in Russian', () => {
+  it('is titled "Дресс-код" and invites the guests, in Russian, to wear the shades below', () => {
     const el: HTMLElement = create().nativeElement;
+    const say = (selector: string) => el.querySelector(selector)?.textContent?.replace(/\s+/g, ' ').trim();
 
     expect(el.querySelector('h2')?.textContent).toContain('Дресс-код');
-    expect(el.querySelector('.lead')?.textContent?.trim()).toBe('Мы будем рады видеть вас');
-    expect(el.querySelector('.script')?.textContent?.trim()).toBe('в нарядах этих оттенков');
+    expect(say('.lead')).toBe('Мы трепетно готовимся к нашему незабываемому дню!');
+    expect(say('.ask')).toBe(
+      'Нам будет очень приятно, если вы поддержите стилистику нашей свадьбы и, по возможности, используете в ваших нарядах предложенные оттенки:',
+    );
+    expect(el.querySelector('.script')).toBeNull();
+  });
+
+  it('has the small print under the circles: one piece of clothing in the palette is enough', () => {
+    const el: HTMLElement = create().nativeElement;
+    const hint = el.querySelector('.hint')!;
+
+    expect(hint.textContent?.replace(/\s+/g, ' ').trim()).toBe(
+      '(Не обязательно полностью одеваться в цветовую палитру, достаточно будет одного элемента в одежде по желанию)',
+    );
+    // after the circles, not before
+    expect(el.querySelector('ul.palette')!.compareDocumentPosition(hint) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('shows the guests in the palette (with a description) and a soft floor shadow', () => {
@@ -64,7 +79,7 @@ describe('DressCode', () => {
   it('shows every part at once where IntersectionObserver is missing', () => {
     const el: HTMLElement = create().nativeElement;
     const parts = [...el.querySelectorAll('[data-reveal]')];
-    expect(parts.length).toBe(4); // the heading, the guests, the sentence and the palette
+    expect(parts.length).toBe(5); // the heading, the guests, the sentence, the palette and the small print
     for (const part of parts) expect(part.classList.contains('is-visible')).toBe(true);
   });
 

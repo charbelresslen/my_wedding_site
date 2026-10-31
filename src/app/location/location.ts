@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { revealParts } from '../shared/reveal-on-view';
 import { VenueMap } from './venue-map';
+import { SafeImg } from '../shared/safe-img';
 
 interface Venue {
   id: string;
@@ -9,6 +10,8 @@ interface Venue {
   city: string;
   name: string;
   address: string;
+  /** the hall inside the venue, shown as one more line under the address */
+  hall?: string;
   photo: { src: string; width: number; height: number; alt: string };
   /** the picture of the map, with a pin on the exact spot (Yandex Static Maps) */
   preview: string;
@@ -45,6 +48,7 @@ const VENUES: Venue[] = [
     city: 'Екатеринбург',
     name: 'Отель «Гранд Авеню»',
     address: 'проспект Ленина, 40',
+    hall: 'Банкетный зал Кейс',
     photo: {
       src: 'media/loc-hotel.webp',
       width: 1200,
@@ -65,7 +69,7 @@ const VENUES: Venue[] = [
  */
 @Component({
   selector: 'app-location',
-  imports: [VenueMap],
+  imports: [VenueMap, SafeImg],
   templateUrl: './location.html',
   styleUrl: './location.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

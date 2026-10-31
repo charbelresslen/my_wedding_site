@@ -13,34 +13,46 @@ describe('GiftSection', () => {
   /** the text of an element, with the no-break spaces of the typography turned into plain ones */
   const say = (el: Element | null) => el?.textContent?.replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
 
-  it('is titled "О подарках" and says, in Russian, that their love, prayers and presence are the best support', () => {
+  it('is titled "Пожелания"', () => {
     const el: HTMLElement = create().nativeElement;
-
-    expect(say(el.querySelector('h2'))).toBe('О подарках');
-    const lead = say(el.querySelector('.lead'))!;
-    expect(lead).toContain('Лучшая поддержка');
-    expect(lead).toContain('любовь');
-    expect(lead).toContain('молитвы');
-    expect(lead).toContain('присутствие');
+    expect(say(el.querySelector('h2'))).toBe('Пожелания');
   });
 
-  it('asks warmly for a gift in an envelope, as a contribution to the family', () => {
+  it("has the three wishes, in the couple's own words, one after the other", () => {
     const el: HTMLElement = create().nativeElement;
     const texts = [...el.querySelectorAll('.text')].map((t) => say(t)!);
 
     expect(texts.length).toBe(3);
-    expect(texts[1]).toContain('конвертом');
-    expect(texts[1]).toContain('вкладом');
-    expect(texts[1]).toContain('семью');
+    expect(texts[0]).toBe(
+      'Дорогие родные и близкие, если хотите подарить нам ценный и нужный подарок, мы будем очень благодарны за вклад в бюджет нашей молодой семьи.',
+    );
+    expect(texts[1]).toBe(
+      'Вместо мимолётной радости от букета цветов, мы бы хотели испытать свою удачу и с теплом вспоминать вас в то время, когда будем зачёркивать числа на лотерейных билетах. Вдруг нам повезёт!',
+    );
+    expect(texts[2]).toContain('Если вы планируете подготовить творческое поздравление, пожалуйста, сообщите об этом нашему ведущему:');
   });
 
-  it('has the light line about lottery tickets instead of bouquets', () => {
+  it('separates the wishes with an ornament (the "***"), not with literal asterisks', () => {
     const el: HTMLElement = create().nativeElement;
-    const joke = say([...el.querySelectorAll('.text')].pop()!)!;
+    const writing = [...el.querySelector('.writing')!.children].map((c) => (c.classList.contains('sep') ? 'sep' : c.tagName.toLowerCase()));
 
-    expect(joke).toContain('вместо букетов');
-    expect(joke).toContain('лотерейные билеты');
-    expect(joke).toContain('повезёт');
+    expect(writing).toEqual(['h2', 'img', 'p', 'sep', 'p', 'sep', 'p']);
+    for (const sep of el.querySelectorAll('.sep')) expect(sep.getAttribute('aria-hidden')).toBe('true');
+    expect(el.textContent).not.toContain('*');
+  });
+
+  it("gives the host's name and number as a link that calls from a phone", () => {
+    const el: HTMLElement = create().nativeElement;
+    const phone = el.querySelector<HTMLAnchorElement>('a.phone')!;
+
+    expect(say(phone)).toBe('Илья +7 908 639 7561');
+    expect(phone.getAttribute('href')).toBe('tel:+79086397561');
+  });
+
+  it('no longer has the earlier envelope wording or the little envelope picture', () => {
+    const el: HTMLElement = create().nativeElement;
+    expect(el.textContent).not.toMatch(/конверт|молитв/);
+    expect(el.querySelector('.envelope')).toBeNull();
   });
 
   it('writes on the wall', () => {
@@ -48,8 +60,8 @@ describe('GiftSection', () => {
     const src = (selector: string) => el.querySelector(selector)?.getAttribute('src');
 
     expect(src('.wall')).toBe('media/gift-wall.webp');
-    // the wall, the divider and the envelope are decoration
-    for (const decoration of el.querySelectorAll('.wall, .divider, .envelope')) expect(decoration.getAttribute('aria-hidden')).toBe('true');
+    // the wall and the divider are decoration
+    for (const decoration of el.querySelectorAll('.wall, .divider')) expect(decoration.getAttribute('aria-hidden')).toBe('true');
     for (const img of el.querySelectorAll('img')) expect(img.getAttribute('alt')).toBe('');
   });
 

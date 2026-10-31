@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, inject, input, signal } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
+import { SafeImg } from '../shared/safe-img';
 
 /**
  * How long the movable map is given to draw its tiles after its page has loaded, before it fades in over the picture.
@@ -20,6 +21,7 @@ const TILES_MS = 4500;
  */
 @Component({
   selector: 'app-venue-map',
+  imports: [SafeImg],
   templateUrl: './venue-map.html',
   styleUrl: './venue-map.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

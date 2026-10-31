@@ -3,7 +3,7 @@
 }
 
 .couple {
-  padding: clamp(48px, 14vw, 84px) 0 clamp(72px, 19vw, 120px);
+  padding: clamp(40px, 11vw, 68px) 0 clamp(72px, 19vw, 120px);
   overflow: clip;
   color: var(--ink);
   text-align: center;
@@ -15,32 +15,42 @@
   padding-inline: 20px;
 }
 
-.title {
-  margin: 0;
-  font-family: var(--font-script);
-  font-weight: 400;
-  font-size: clamp(50px, 14.5vw, 72px);
-  line-height: 1.05;
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
+/* the same ornament above and below the sentence, like a pair of brackets */
 .divider {
   display: block;
   width: clamp(96px, 29vw, 140px);
   height: auto;
-  margin: 8px auto clamp(22px, 6vw, 30px);
+  margin: 0 auto;
   opacity: 0.8;
   user-select: none;
   -webkit-user-drag: none;
 }
 
+.divider-top {
+  margin-bottom: clamp(24px, 7vw, 34px);
+}
+
+.divider-bottom {
+  margin-top: clamp(24px, 7vw, 34px);
+}
+
 .lead {
   margin: 0 auto;
-  max-width: 34ch;
+  max-width: 24ch;
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 500;
-  font-size: clamp(18px, 4.6vw, 20px);
-  line-height: 1.55;
+  font-size: clamp(25px, 6.9vw, 31px);
+  line-height: 1.42;
   text-wrap: balance;
 }
 
@@ -155,16 +165,20 @@
     transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-.divider.is-visible {
-  transition-delay: 0.15s;
+.divider-top.is-visible {
+  transition-delay: 0.1s;
 }
 
 .lead.is-visible {
-  transition-delay: 0.3s;
+  transition-delay: 0.25s;
+}
+
+.divider-bottom.is-visible {
+  transition-delay: 0.4s;
 }
 
 .board.is-visible {
-  transition-delay: 0.45s;
+  transition-delay: 0.55s;
 }
 
 /* the smaller photo settles onto the corner a beat after the board, so it visibly lands there */

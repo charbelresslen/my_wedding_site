@@ -87,3 +87,9 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
+
+/* A picture checked before it is shown (src/app/shared/safe-img.ts) is drawn only once its verified copy has loaded:
+   until then it has no src at all, and an <img> without one (or one still loading) paints a thin empty box. */
+img[safeSrc]:not([data-ready]) {
+  visibility: hidden;
+}

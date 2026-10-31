@@ -3,7 +3,7 @@
     <h2 class="title reveal" id="timeline-title">Программа дня</h2>
     <img
       class="rule reveal"
-      src="media/timeline-rule.webp"
+      safeSrc="media/timeline-rule.webp"
       width="1000"
       height="88"
       alt=""
@@ -16,17 +16,17 @@
   <div class="track">
     <!-- the rail: the first stick's finial, a plain rod, the last stick's finial -->
     <div class="rail" aria-hidden="true">
-      <img class="cap cap-top" src="media/timeline-top.webp" width="162" height="430" alt="" decoding="async" loading="lazy" />
-      <img class="rod" src="media/timeline-rod.webp" width="162" height="120" alt="" decoding="async" loading="lazy" />
-      <img class="cap cap-bottom" src="media/timeline-bottom.webp" width="162" height="408" alt="" decoding="async" loading="lazy" />
+      <img class="cap cap-top" safeSrc="media/timeline-top.webp" width="162" height="430" alt="" decoding="async" loading="lazy" />
+      <img class="rod" safeSrc="media/timeline-rod.webp" width="162" height="120" alt="" decoding="async" loading="lazy" />
+      <img class="cap cap-bottom" safeSrc="media/timeline-bottom.webp" width="162" height="408" alt="" decoding="async" loading="lazy" />
     </div>
 
     <ol class="list">
       @for (step of steps; track step.time; let i = $index) {
         <li class="step" [class.step-flip]="i % 2 === 1" data-reveal>
-          <div class="art">
+          <div class="art" [style.--k]="step.size ?? 1">
             <img
-              [src]="step.art"
+              [safeSrc]="step.art"
               [attr.width]="step.width"
               [attr.height]="step.height"
               alt=""
@@ -45,6 +45,6 @@
     </ol>
 
     <!-- the flower that rides the rail as the page scrolls -->
-    <img class="flower" src="media/timeline-flower.webp" width="256" height="246" alt="" aria-hidden="true" decoding="async" />
+    <img class="flower" safeSrc="media/timeline-flower.webp" width="256" height="246" alt="" aria-hidden="true" decoding="async" />
   </div>
 </section>

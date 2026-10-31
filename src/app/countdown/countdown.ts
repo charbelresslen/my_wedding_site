@@ -1,12 +1,14 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRender, computed, inject, signal } from '@angular/core';
 import { revealOnView } from '../shared/reveal-on-view';
+import { SafeImg } from '../shared/safe-img';
 
 /**
- * The moment the celebration begins: 19 December 2026, 16:00 (the arrival at the ZAGS, as in the programme).
+ * The moment the celebration begins: 19 December 2026, 16:30 (the ceremony, as in the programme; the guests gather
+ * from 16:10).
  * It is read as the guest's local time. To pin it to the venue's time zone whatever the guest's own is, add the
- * offset, e.g. '2026-12-19T16:00:00+03:00'.
+ * offset, e.g. '2026-12-19T16:30:00+05:00'.
  */
-export const CELEBRATION = new Date('2026-12-19T16:00:00');
+export const CELEBRATION = new Date('2026-12-19T16:30:00');
 
 export interface Parts {
   days: number;
@@ -70,6 +72,7 @@ interface UnitView {
  */
 @Component({
   selector: 'app-countdown',
+  imports: [SafeImg],
   templateUrl: './countdown.html',
   styleUrl: './countdown.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

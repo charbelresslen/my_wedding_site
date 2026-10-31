@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { revealOnView } from '../shared/reveal-on-view';
+import { SafeImg } from '../shared/safe-img';
 
 /**
  * Step 4: the invitation itself, written on the wall of the ZAGS hall, with peonies in the two bottom corners.
@@ -7,6 +8,7 @@ import { revealOnView } from '../shared/reveal-on-view';
  */
 @Component({
   selector: 'app-invitation',
+  imports: [SafeImg],
   templateUrl: './invitation.html',
   styleUrl: './invitation.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

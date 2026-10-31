@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { SafeImg } from '../shared/safe-img';
 
 /**
  * Step 2: the welcome. The couple's photo at full width, the names in calligraphy, flowers at the
@@ -7,6 +8,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
  */
 @Component({
   selector: 'app-hero',
+  imports: [SafeImg],
   templateUrl: './hero.html',
   styleUrl: './hero.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

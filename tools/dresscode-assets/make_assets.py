@@ -7,7 +7,9 @@ Sources:
   source-palette.jpg      the user's circles: burgundy, dark brown, mocha, dusty pink (their colours were read from it)
   reference-screenshot.png  the example card the section is modelled on
 
-Writes public/media/dress-people.webp: the full figures trimmed to their outline (nothing cropped away - see
+Writes public/media/dress-people.webp: the third man (the one in the brown suit) shown without his jacket and vest - a
+white shirt, his tie carried down to the belt, shirt sleeves to the cuffs (painted over the source by shirtsleeves.py,
+beside this script; the source file itself is the user's and is left as it is) - and the full figures trimmed to their outline (nothing cropped away - see
 EDGE_PAD below for why there is still a transparent margin left and right of them), at their own real colours -
 the last woman's dress is NOT recoloured (an earlier version of this script multiply-blended it towards an assumed
 "cream" target, which just made it look like a different, wrong dress next to the actual photo - the source's own
@@ -22,6 +24,8 @@ import os
 import numpy as np
 from PIL import Image
 
+from shirtsleeves import apply as take_the_jacket_off
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.normpath(os.path.join(HERE, '..', '..', 'public', 'media'))
 
@@ -33,6 +37,7 @@ OUT = os.path.normpath(os.path.join(HERE, '..', '..', 'public', 'media'))
 EDGE_PAD = 40
 
 im = Image.open(os.path.join(HERE, 'source-people.webp')).convert('RGBA')
+im = Image.fromarray(take_the_jacket_off(np.asarray(im, dtype=float)).round().astype(np.uint8), 'RGBA')
 alpha = np.array(im.split()[3])
 ys, xs = np.nonzero(alpha > 10)
 im = im.crop((xs.min(), ys.min(), xs.max() + 1, ys.max() + 1))

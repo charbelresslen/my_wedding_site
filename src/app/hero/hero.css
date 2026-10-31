@@ -27,11 +27,11 @@
    * couple), matching that video's own framing of this exact photo.
    */
   --i-names: clamp(54px, 16vw, 78px);
-  --i-kicker: clamp(17px, 4.6vw, 21px);
+  --i-kicker: clamp(24px, 8.8vw, 49px);
   --i-sep: clamp(96px, 29vw, 140px);
   --i-flower: clamp(92px, 31vw, 190px);
   --i-foot: 84px;
-  --i-copy-h: calc(2.64 * var(--i-kicker) + var(--i-sep) / 6.8 + 16px + 1.92 * var(--i-names));
+  --i-copy-h: calc(1.2 * var(--i-kicker) + var(--i-sep) / 6.8 + 16px + 1.92 * var(--i-names));
   --i-photo-h: calc(var(--col-w) / 0.758);
   --i-total-h: calc(var(--i-photo-h) + var(--i-copy-h) + 14px + var(--i-foot));
 
@@ -133,12 +133,16 @@
 
 .kicker {
   margin: 0;
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 500;
+  /* the same script as the names, set big enough to read as part of the same line of writing (one line on a
+     phone: that is also less height than the two small lines it replaces) */
+  font-family: var(--font-script);
+  font-weight: 400;
   font-size: var(--kicker-size);
-  line-height: 1.32;
-  letter-spacing: 0.035em;
+  line-height: 1.2;
+  /* Great Vibes has a very narrow space */
+  word-spacing: 0.14em;
+  /* always one line (at 8.8vw it is about 89% of the screen's width) */
+  white-space: nowrap;
 }
 
 .divider {
@@ -249,7 +253,7 @@
 @media (min-aspect-ratio: 1/1) {
   .hero {
     --names-size: clamp(56px, 8vw, 118px);
-    --kicker-size: clamp(18px, 2vw, 28px);
+    --kicker-size: clamp(30px, 3.9vw, 58px);
     --sep-w: clamp(110px, 11vw, 190px);
     --flower-w: clamp(110px, 14vw, 200px);
     --pad: clamp(18px, 3.2vw, 46px);

@@ -106,7 +106,8 @@
 .art {
   grid-area: 1 / 1;
   justify-self: center;
-  width: min(100%, 230px);
+  /* --k: tall or small pictures are drawn at a fraction of the usual width (set per step in timeline.ts) */
+  width: min(100%, calc(230px * var(--k, 1)));
 }
 
 .art img {

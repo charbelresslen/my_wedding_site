@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { revealParts } from '../shared/reveal-on-view';
+import { SafeImg } from '../shared/safe-img';
 
 interface Shade {
   name: string;
@@ -32,6 +33,7 @@ const SHADES: Shade[] = [
  */
 @Component({
   selector: 'app-dress-code',
+  imports: [SafeImg],
   templateUrl: './dress-code.html',
   styleUrl: './dress-code.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

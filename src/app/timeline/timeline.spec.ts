@@ -15,7 +15,7 @@ describe('Timeline', () => {
     return fixture;
   }
 
-  it('lists the programme in order: 16:00 arrival at the ZAGS, 18:00 welcome drink, 19:00 banquet dinner', () => {
+  it('lists the programme in order: guests gather 16:10, ceremony 16:30, guests meet in the hall 17:30, banquet 18:30, end 23:30', () => {
     const el: HTMLElement = create().nativeElement;
 
     expect(el.querySelector('h2')?.textContent).toContain('Программа дня');
@@ -24,17 +24,19 @@ describe('Timeline', () => {
       label: li.querySelector('.label')?.textContent?.trim(),
     }));
     expect(steps).toEqual([
-      { time: '16:00', label: 'Прибытие в ЗАГС' },
-      { time: '18:00', label: 'Приветственный напиток' },
-      { time: '19:00', label: 'Банкетный ужин' },
+      { time: '16:10', label: 'Сбор гостей в ЗАГСе' },
+      { time: '16:30', label: 'Торжественная церемония' },
+      { time: '17:30', label: 'Встреча гостей в банкетном зале' },
+      { time: '18:30', label: 'Банкет' },
+      { time: '23:30', label: 'Завершение вечера' },
     ]);
-    expect([...el.querySelectorAll('time')].map((t) => t.getAttribute('datetime'))).toEqual(['16:00', '18:00', '19:00']);
+    expect([...el.querySelectorAll('time')].map((t) => t.getAttribute('datetime'))).toEqual(['16:10', '16:30', '17:30', '18:30', '23:30']);
   });
 
   it('puts the pictures on alternating sides', () => {
     const el: HTMLElement = create().nativeElement;
     const flips = [...el.querySelectorAll('.step')].map((step) => step.classList.contains('step-flip'));
-    expect(flips).toEqual([false, true, false]);
+    expect(flips).toEqual([false, true, false, true, false]);
   });
 
   it('draws the rail from the two finials and a rod, and has the flower; every picture is decoration', () => {
@@ -47,9 +49,11 @@ describe('Timeline', () => {
     expect(src('.flower')).toBe('media/timeline-flower.webp');
     expect(src('.rule')).toBe('media/timeline-rule.webp');
     expect([...el.querySelectorAll('.art img')].map((img) => img.getAttribute('src'))).toEqual([
+      'media/timeline-gathering.webp',
       'media/timeline-arrival.webp',
       'media/timeline-welcome.webp',
       'media/timeline-banquet.webp',
+      'media/timeline-finale.webp',
     ]);
     for (const img of el.querySelectorAll('img')) expect(img.getAttribute('alt')).toBe('');
   });
@@ -62,7 +66,7 @@ describe('Timeline', () => {
   it('shows every part at once where IntersectionObserver is missing', () => {
     const el: HTMLElement = create().nativeElement;
     const parts = [...el.querySelectorAll('[data-reveal]')];
-    expect(parts.length).toBe(4); // the heading and the three steps
+    expect(parts.length).toBe(6); // the heading and the five steps
     for (const part of parts) expect(part.classList.contains('is-visible')).toBe(true);
   });
 
@@ -89,7 +93,7 @@ describe('Timeline', () => {
     expect(steps.every((s) => !s.classList.contains('is-visible'))).toBe(true);
 
     timelineObserver.callback([{ isIntersecting: true, target: steps[1] } as unknown as IntersectionObserverEntry], {} as IntersectionObserver);
-    expect(steps.map((s) => s.classList.contains('is-visible'))).toEqual([false, true, false]);
+    expect(steps.map((s) => s.classList.contains('is-visible'))).toEqual([false, true, false, false, false]);
 
     fixture.destroy();
     expect(timelineObserver.disconnect).toHaveBeenCalled();
@@ -97,8 +101,8 @@ describe('Timeline', () => {
 
   describe('the flower that rides the rail', () => {
     /**
-     * Fake layout: the track starts 1000 px down the page, its first marker is 100 px and its last marker 500 px below
-     * the top of the track; the screen is 800 px tall.
+     * Fake layout: the track starts 1000 px down the page, its first marker is 100 px and its last (fifth) marker 500 px
+     * below the top of the track; the screen is 800 px tall.
      */
     function withLayout(pageHeight: number, reduceMotion = true) {
       vi.stubGlobal('matchMedia', (query: string) => ({ matches: reduceMotion && query.includes('reduce'), media: query }));
@@ -114,7 +118,7 @@ describe('Timeline', () => {
         if (this.classList.contains('track')) top = 1000;
         if (this.classList.contains('node')) {
           const index = [...document.querySelectorAll('.node')].indexOf(this);
-          top = 1000 + 100 + index * 200;
+          top = 1000 + 100 + index * 100;
         }
         return { top, left: 0, right: 0, bottom: top, width: 0, height: 0, x: 0, y: top, toJSON: () => ({}) } as DOMRect;
       });

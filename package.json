@@ -3,10 +3,16 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "assets:manifest": "node tools/make-asset-manifest.mjs",
+    "prestart": "npm run assets:manifest",
     "start": "ng serve",
+    "prestart:vm": "npm run assets:manifest",
     "start:vm": "ng serve --configuration production --port 4500 --host 0.0.0.0",
+    "prebuild": "npm run assets:manifest",
     "build": "ng build",
+    "prewatch": "npm run assets:manifest",
     "watch": "ng build --watch --configuration development",
+    "pretest": "npm run assets:manifest",
     "test": "ng test"
   },
   "private": true,

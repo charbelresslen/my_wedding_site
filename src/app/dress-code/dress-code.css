@@ -82,19 +82,34 @@
   margin: 0;
   font-family: var(--font-serif);
   font-style: italic;
-  font-weight: 500;
-  font-size: clamp(20px, 5.6vw, 26px);
+  font-weight: 600;
+  font-size: clamp(23px, 6.4vw, 29px);
   line-height: 1.3;
-  letter-spacing: 0.02em;
+  text-wrap: balance;
 }
 
-.script {
-  margin: 2px 0 0;
-  font-family: var(--font-script);
-  font-weight: 400;
-  font-size: clamp(38px, 11.4vw, 54px);
-  line-height: 1.15;
-  /* if it has to wrap on a narrow phone, into two even lines, not one word alone */
+.ask {
+  margin: 12px auto 0;
+  max-width: 31ch;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(18px, 5vw, 21px);
+  line-height: 1.45;
+  text-wrap: balance;
+}
+
+/* the small print under the circles */
+.hint {
+  margin: clamp(26px, 8vw, 36px) auto 0;
+  padding-inline: 24px;
+  max-width: 36ch;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(13.5px, 3.8vw, 15.5px);
+  line-height: 1.45;
+  opacity: 0.85;
   text-wrap: balance;
 }
 
@@ -207,6 +222,10 @@
 
 .say.is-visible {
   transition-delay: 0.1s;
+}
+
+.hint.is-visible {
+  transition-delay: 0.2s;
 }
 
 /*
