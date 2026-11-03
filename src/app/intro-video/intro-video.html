@@ -38,8 +38,10 @@
 
   @if (phase() === 'loading' || (phase() === 'playing' && buffering())) {
     <!-- Fades in only after a moment, so a fast load never flashes it. (Also shown when the video, once started, has
-         to wait for its data.) -->
-    <span class="caption wait" lang="ru" role="status">Загрузка…</span>
+         to wait for its data.) The percentage is left out of what a screen reader announces: it changes constantly. -->
+    <span class="caption wait" lang="ru" role="status"
+      >Загрузка…@if (percent(); as p) {<span aria-hidden="true">&nbsp;{{ p }}%</span>}</span
+    >
   } @else if (phase() === 'ready') {
     <!-- Invisible tap target with a caption prompt: opening the envelope always needs this real tap, so the guest
          chooses when the video's own sound starts, instead of the browser's autoplay rules deciding for them. -->

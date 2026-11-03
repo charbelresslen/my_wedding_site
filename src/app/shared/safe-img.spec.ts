@@ -1,7 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { fnv1aHex } from './fnv1a';
-import { IMAGE_FINGERPRINTS, RETRY_DELAYS_MS, SafeImg, fingerprintOf } from './safe-img';
+import { MEDIA_FINGERPRINTS, RETRY_DELAYS_MS, fingerprintOf } from './media-loader';
+import { SafeImg } from './safe-img';
 
 @Component({
   imports: [SafeImg],
@@ -23,19 +24,16 @@ function reply(bytes: Uint8Array, status = 200) {
 describe('SafeImg', () => {
   let fetchMock: ReturnType<typeof vi.fn>;
   let created: string[];
-  let revoked: string[];
 
   beforeEach(() => {
     vi.useFakeTimers();
     fetchMock = vi.fn();
     created = [];
-    revoked = [];
     vi.stubGlobal('fetch', fetchMock);
     URL.createObjectURL = vi.fn(() => {
       created.push(`blob:copy-${created.length}`);
       return created[created.length - 1];
     });
-    URL.revokeObjectURL = vi.fn((url: string) => void revoked.push(url));
   });
 
   afterEach(() => {
@@ -45,7 +43,7 @@ describe('SafeImg', () => {
 
   function create(fingerprints: Record<string, string> | null, loading: string | null = null) {
     TestBed.configureTestingModule({
-      providers: fingerprints ? [{ provide: IMAGE_FINGERPRINTS, useValue: fingerprints }] : [],
+      providers: fingerprints ? [{ provide: MEDIA_FINGERPRINTS, useValue: fingerprints }] : [],
     });
     const fixture = TestBed.createComponent(Host);
     fixture.componentInstance.loading.set(loading);
@@ -135,33 +133,21 @@ describe('SafeImg', () => {
     expect(img.getAttribute('src')).toBe('media/a.webp');
   });
 
-  it('keeps a lazy picture back until it is near the screen', async () => {
-    const watchers: { callback: IntersectionObserverCallback; disconnect: ReturnType<typeof vi.fn> }[] = [];
+  it('downloads a lazy picture too, in the background, without waiting for it to come near the screen', async () => {
     vi.stubGlobal(
       'IntersectionObserver',
       class {
         disconnect = vi.fn();
         observe = vi.fn();
-        constructor(callback: IntersectionObserverCallback) {
-          watchers.push({ callback, disconnect: this.disconnect });
-        }
       },
     );
     fetchMock.mockResolvedValue(reply(GOOD));
     const { img } = create({ 'media/a.webp': fingerprintOf(GOOD) }, 'lazy');
     await settle();
 
-    expect(fetchMock).not.toHaveBeenCalled();
-    const watcher = watchers[watchers.length - 1];
-    watcher.callback([{ isIntersecting: false } as IntersectionObserverEntry], {} as IntersectionObserver);
-    await settle();
-    expect(fetchMock).not.toHaveBeenCalled();
-
-    watcher.callback([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver);
-    await settle();
-    expect(watcher.disconnect).toHaveBeenCalled();
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(img.getAttribute('src')).toBe('blob:copy-0');
+    expect(img.loading).toBe('eager');
   });
 
   it('is marked ready only when the browser has loaded the picture, and not ready again for a new address', async () => {
@@ -178,7 +164,7 @@ describe('SafeImg', () => {
     expect(img.hasAttribute('data-ready')).toBe(false);
   });
 
-  it('follows a changed address, and frees the local copy of the old one', async () => {
+  it('follows a changed address', async () => {
     fetchMock.mockResolvedValue(reply(GOOD));
     const { fixture, img } = create({ 'media/a.webp': fingerprintOf(GOOD), 'media/b.webp': fingerprintOf(GOOD) });
     await settle();
@@ -188,20 +174,18 @@ describe('SafeImg', () => {
     fixture.detectChanges();
     await settle();
 
-    expect(revoked).toEqual(['blob:copy-0']);
     expect(fetchMock.mock.calls[1][0]).toBe('media/b.webp');
     expect(img.getAttribute('src')).toBe('blob:copy-1');
   });
 
-  it('gives up quietly when its element is destroyed in the middle of the tries', async () => {
-    fetchMock.mockResolvedValue(reply(DAMAGED));
+  it('leaves its element alone when it is destroyed before the picture has arrived', async () => {
+    fetchMock.mockResolvedValueOnce(reply(DAMAGED)).mockResolvedValue(reply(GOOD));
     const { fixture, img } = create({ 'media/a.webp': fingerprintOf(GOOD) });
     await settle();
 
     fixture.destroy();
     for (const delay of RETRY_DELAYS_MS) await vi.advanceTimersByTimeAsync(delay);
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(img.getAttribute('src')).toBeNull();
   });
 });

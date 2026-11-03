@@ -12,18 +12,29 @@ npm test           # unit tests
 ```
 
 Before every `npm start`, `npm run build` and `npm test` a small script (`tools/make-asset-manifest.mjs`) rewrites
-`src/app/shared/asset-manifest.ts`: the size and checksum of every picture in `public/media`. If you build some other
-way (e.g. a bare `npx ng build`), run `npm run assets:manifest` first, and after changing any picture.
+`src/app/shared/asset-manifest.ts`: the size and checksum of every picture and of the video in `public/media`. If you
+build some other way (e.g. a bare `npx ng build`), run `npm run assets:manifest` first, and after changing any picture
+or the video.
 
 **Pictures that arrive damaged.** From some places (it happened on Anna's other site, from Russia) a picture served
 over plain http comes out half-drawn or with strange colours, because the bytes are cut or rewritten on the way and the
 browser paints whatever arrived without any error. So no `<img>` of the site uses `src` for its pictures: it uses
-`safeSrc` (`src/app/shared/safe-img.ts`). That directive downloads the picture itself, compares its size and checksum
-with the recorded ones, shows it only if they match (otherwise it downloads again, up to six times, past the cache and
-from a different address each time) and, if every try fails, lets the browser load it plainly. Until a picture is
-verified it is invisible (`styles.css`). Left as they are: the envelope video and its poster (shown at once, they are
-the first thing a guest sees) and the Yandex map picture (not ours). Serving the site over **https** would stop this at
-the root; for now the check is what protects the pictures.
+`safeSrc` (`src/app/shared/safe-img.ts`), which takes the picture from `MediaLoader` (`src/app/shared/media-loader.ts`).
+That loader downloads each file itself, compares its size and checksum with the recorded ones, uses it only if they
+match (otherwise it downloads again, up to six times, past the cache and from a different address each time; a download
+that goes silent for 8 seconds is cut off and tried again) and, if every try fails, lets the browser load it plainly.
+Until a picture is verified it is invisible (`styles.css`). The envelope video is checked the same way. Left as they
+are: the envelope poster (shown at once, it is the first thing a guest sees) and the Yandex map picture (not ours).
+Serving the site over **https** would stop this at the root; for now the check is what protects the pictures.
+
+**Loading order (first visit).** 1) The envelope poster, then the WHOLE video, with "Загрузка… 42%" on the envelope;
+the tap is offered only once the video is in, so it then plays from the phone's memory and cannot stall on the network.
+2) Meanwhile every picture is held back so it does not take bandwidth from the video. 3) Once the video is in, all the
+page's pictures download in the background, four at a time, in page order (hero first) - while the guest taps and
+watches - so nothing pops in when scrolling; one that comes near the screen before its turn is moved to the front.
+4) The fade at the end of the video waits until the hero's pictures are here (at most 6 s more, holding on the last
+frame). The server keeps pictures and video in the phone's cache for a week (`index.html` is never cached, so a new
+build reaches guests at once; a changed picture fails its checksum against the new list and is fetched again).
 
 > Use the project's own Angular (`npm start`, `npx ng ...`), not a globally installed `ng`.
 > Angular 21 needs Node 20.19+, 22.12+ or 24+.
@@ -393,9 +404,11 @@ connections) never got to start it: the envelope stayed frozen. `tools/faststart
 re-encoding anything (`python tools/faststart.py public/media/envelope.mp4`; it does nothing if the file is already
 right). Run it whenever `envelope.mp4` is replaced by a file that did not come out of the `ffmpeg` command below.
 
-The page also watches the video (`intro-video.ts`): after the tap, if the picture has not started within 7 seconds, or
-stands still for 4.5 seconds once running, it gives the intro up and fades to the invitation instead of leaving the
-guest on a frozen envelope. A "Загрузка…" caption shows while a started video waits for its data.
+The video is downloaded whole before the tap is offered (see "Loading order" near the top), so it plays from memory.
+The page still watches it (`intro-video.ts`) for browsers that refuse to play at all: after the tap, if the picture has
+not started within 7 seconds, or stands still for 4.5 seconds once running, it gives the intro up and fades to the
+invitation instead of leaving the guest on a frozen envelope. (That watchdog used to fire on first visits, when the
+video was streamed and the network could not keep up - the reason it is now downloaded first.)
 
 To redo both from a new export (`ffmpeg` is not installed system-wide):
 

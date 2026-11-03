@@ -1,6 +1,60 @@
 import { ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { MEDIA_FINGERPRINTS, fingerprintOf } from '../shared/media-loader';
 import { IntroVideo } from './intro-video';
+
+describe('IntroVideo download', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    HTMLMediaElement.prototype.play = vi.fn(() => Promise.resolve());
+    HTMLMediaElement.prototype.pause = vi.fn();
+    HTMLMediaElement.prototype.load = vi.fn();
+    URL.createObjectURL = vi.fn(() => 'blob:whole-video');
+    URL.revokeObjectURL = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it('downloads the whole video before offering the tap, showing how far it has got', async () => {
+    const bytes = new Uint8Array([1, 2, 3, 4]);
+    let rest!: () => void;
+    const restArrived = new Promise<void>((resolve) => (rest = resolve));
+    const reads = [
+      () => Promise.resolve({ done: false, value: bytes.slice(0, 2) }),
+      () => restArrived.then(() => ({ done: false, value: bytes.slice(2) })),
+      () => Promise.resolve({ done: true, value: undefined }),
+    ];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() =>
+        Promise.resolve({ ok: true, status: 200, headers: { get: () => null }, body: { getReader: () => ({ read: () => reads.shift()!() }) } }),
+      ),
+    );
+    TestBed.configureTestingModule({
+      providers: [{ provide: MEDIA_FINGERPRINTS, useValue: { 'media/envelope.mp4': fingerprintOf(bytes) } }],
+    });
+
+    const fixture = TestBed.createComponent(IntroVideo);
+    fixture.detectChanges();
+    TestBed.inject(ApplicationRef).tick();
+    const el: HTMLElement = fixture.nativeElement;
+    await vi.advanceTimersByTimeAsync(3000);
+    fixture.detectChanges();
+
+    expect(el.querySelector('.caption.wait')?.textContent).toContain('50%');
+    expect(el.querySelector('button.tap')).toBeNull();
+    expect(el.querySelector('video')!.getAttribute('src')).toBeNull();
+
+    rest();
+    await vi.advanceTimersByTimeAsync(500);
+    fixture.detectChanges();
+    expect(el.querySelector('video')!.getAttribute('src')).toBe('blob:whole-video');
+    expect(el.querySelector('button.tap')).toBeTruthy();
+  });
+});
 
 describe('IntroVideo', () => {
   let animate: ReturnType<typeof vi.fn>;
@@ -80,6 +134,41 @@ describe('IntroVideo', () => {
       await vi.advanceTimersByTimeAsync(1000);
     }
     expect(animate).not.toHaveBeenCalled();
+  });
+
+  it('fades out only once the pictures of the first screen under it are here', async () => {
+    const pictures: (() => void)[] = [];
+    const bytes = new Uint8Array([9, 8, 7]);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        () =>
+          new Promise((resolve) =>
+            pictures.push(() =>
+              resolve({ ok: true, status: 200, headers: { get: () => null }, arrayBuffer: async () => bytes.buffer.slice(0) }),
+            ),
+          ),
+      ),
+    );
+    URL.createObjectURL = vi.fn(() => 'blob:picture');
+    const fingerprints = Object.fromEntries(
+      ['media/hero-couple.webp', 'media/divider.webp', 'media/flower-left.webp', 'media/flower-right.webp'].map((path) => [
+        path,
+        fingerprintOf(bytes),
+      ]),
+    );
+    TestBed.configureTestingModule({ providers: [{ provide: MEDIA_FINGERPRINTS, useValue: fingerprints }] });
+
+    const { video } = await tapped();
+    video.dispatchEvent(new Event('playing'));
+    video.dispatchEvent(new Event('ended'));
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(animate).not.toHaveBeenCalled();
+
+    pictures.forEach((arrive) => arrive());
+    await vi.advanceTimersByTimeAsync(0);
+    expect(animate).toHaveBeenCalledTimes(1);
+    vi.unstubAllGlobals();
   });
 
   it('does not watch a video that was paused from outside (it asks for a tap again)', async () => {

@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Home } from './home/home';
 import { IntroVideo } from './intro-video/intro-video';
+import { MediaLoader } from './shared/media-loader';
 
 @Component({
   selector: 'app-root',
@@ -14,12 +15,17 @@ export class App {
   /** The page may play its entrance animation. */
   protected readonly revealed = signal(false);
 
+  private readonly loader = inject(MediaLoader);
+
   constructor() {
     // Handy while building: open the site with ?nointro to skip the video.
     if (new URLSearchParams(window.location.search).has('nointro')) {
       this.endIntro();
       // Two frames later, so the page has first been painted in its "before" state and the entrance can animate.
       requestAnimationFrame(() => requestAnimationFrame(() => this.revealed.set(true)));
+    } else {
+      // The envelope video downloads first; the intro lets the page's pictures through once it is in.
+      this.loader.hold();
     }
   }
 
@@ -36,6 +42,7 @@ export class App {
 
   private endIntro(): void {
     this.introDone.set(true);
+    this.loader.release();
 
     const root = document.documentElement;
     root.classList.remove('intro-active');

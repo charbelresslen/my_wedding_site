@@ -10,8 +10,17 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { MediaLoader } from '../shared/media-loader';
 
 const VIDEO_SRC = 'media/envelope.mp4';
+
+/**
+ * The pictures of the first screen under the overlay (hero.html). The video ends on that same screen, so the fade
+ * waits until they are here - at most FIRST_SCREEN_WAIT_MS, holding on the video's last frame meanwhile - instead of
+ * fading onto a hero whose photo has not arrived yet.
+ */
+const FIRST_SCREEN_PICTURES = ['media/hero-couple.webp', 'media/divider.webp', 'media/flower-left.webp', 'media/flower-right.webp'];
+const FIRST_SCREEN_WAIT_MS = 6000;
 
 /**
  * Length of the fade into the main page. envelope.mp4 now cuts, on its own (baked into the file), from the sealed
@@ -68,7 +77,7 @@ const STALL_LIMIT_MS = 4500;
 const SHOW_WAIT_AFTER_MS = 800;
 
 /**
- * - loading: the video's first frame is still buffering
+ * - loading: the video is still downloading (it is fetched whole before the tap is offered, see `preload()`)
  * - ready:   a frame is ready; waiting for a tap
  * - playing: playing
  * - fading:  the last moments; overlay is fading out to the main page
@@ -100,8 +109,14 @@ export class IntroVideo {
   protected readonly buffering = signal(false);
   /** A landscape window: the spare sides are painted from the video's own edges (see the CSS, `.ambient`). */
   protected readonly wide = signal(false);
+  /** How much of the video has downloaded, in whole percent; null while unknown (shown in the "Загрузка…" caption). */
+  protected readonly percent = signal<number | null>(null);
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly loader = inject(MediaLoader);
+  /** The local copy of the whole video, once downloaded and checked. */
+  private videoUrl: string | undefined;
+  private fadeRequested = false;
   private readonly videoRef = viewChild.required<ElementRef<HTMLVideoElement>>('video');
   private readonly ambient = viewChild<ElementRef<HTMLCanvasElement>>('ambient');
   private readonly layoutCleanup: (() => void)[] = [];
@@ -228,20 +243,36 @@ export class IntroVideo {
    */
   protected onPause(): void {
     const video = this.videoRef().nativeElement;
-    // 'pause' also fires just before 'ended', and the fade finishes on its own clock.
-    if (this.phase() === 'playing' && !video.ended) {
+    // 'pause' also fires just before 'ended', and when the intro is given up; the fade finishes on its own clock.
+    if (this.phase() === 'playing' && !video.ended && !this.fadeRequested) {
       this.phase.set('ready');
       this.needsTap.set(true);
       this.buffering.set(false);
     }
   }
 
-  /** Also called by the `ended` event as a safety net (e.g. the tab was in the background). */
+  /**
+   * The video has reached its end (or is given up): fade out as soon as the first screen under it is ready - the video
+   * holds on its last frame meanwhile. Also called by the `ended` event as a safety net (e.g. the tab was in the
+   * background).
+   */
   protected startFade(): void {
-    if (this.phase() === 'fading') return;
-    this.phase.set('fading');
+    if (this.fadeRequested) return;
+    this.fadeRequested = true;
     this.stopWatching();
     this.buffering.set(false);
+
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const enough = new Promise<void>((resolve) => (timer = setTimeout(resolve, FIRST_SCREEN_WAIT_MS)));
+    const ready = Promise.all(FIRST_SCREEN_PICTURES.map((url) => this.loader.picture(url)));
+    void Promise.race([ready, enough]).then(() => {
+      clearTimeout(timer);
+      if (!this.abort.signal.aborted) this.fadeOut();
+    });
+  }
+
+  private fadeOut(): void {
+    this.phase.set('fading');
     this.hidePoster();
 
     // Opacity only: runs on the compositor, so it cannot stutter the video.
@@ -264,11 +295,28 @@ export class IntroVideo {
     if (this.phase() !== 'fading') this.finished.emit();
   }
 
+  /**
+   * The WHOLE video is downloaded (and checked, see MediaLoader) before the tap is offered, with the progress in the
+   * caption: streamed straight from the server, a first visit on an ordinary phone connection could not keep up with
+   * playback, so the envelope stopped right after the tap and the watchdog gave the intro up. Played from the local
+   * copy it can no longer wait for the network. The page's pictures are held back meanwhile (the app's `hold()`), so
+   * they do not take bandwidth from it, and let through here. A video that cannot be had whole is streamed as before.
+   */
   private async preload(): Promise<void> {
     const video = this.videoRef().nativeElement;
-    // `preload="auto"` on the element (see the template) streams the file progressively, so first-frame
-    // readiness only needs however much has buffered so far, not the whole ~1.6 MB file.
-    video.src = VIDEO_SRC;
+    const expected = this.loader.fingerprint(VIDEO_SRC);
+    let src = VIDEO_SRC;
+    if (expected && typeof fetch === 'function') {
+      const blob = await this.loader.download(VIDEO_SRC, expected, {
+        signal: this.abort.signal,
+        onProgress: (fraction) => this.percent.set(Math.floor(fraction * 100)),
+      });
+      if (this.abort.signal.aborted) return;
+      if (blob) src = this.videoUrl = URL.createObjectURL(blob);
+    }
+    video.src = src;
+    this.percent.set(null);
+    this.loader.release();
 
     await this.firstFrame(video);
     if (this.abort.signal.aborted) return;
@@ -360,6 +408,7 @@ export class IntroVideo {
 
   private teardown(): void {
     this.abort.abort();
+    this.loader.release();
     this.stopWatching();
     for (const stop of this.layoutCleanup) stop();
     clearTimeout(this.posterTimer);
@@ -372,5 +421,6 @@ export class IntroVideo {
     video.pause();
     video.removeAttribute('src');
     video.load();
+    if (this.videoUrl) URL.revokeObjectURL(this.videoUrl);
   }
 }
