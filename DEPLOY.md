@@ -10,12 +10,12 @@ guest anywhere else on the internet cannot - your computer is not a public addre
 There are three things to put somewhere public: the site's files, the small API, and the database. This guide sets
 up all three **on one small server**, which is the simplest way to do it: one bill, one place to look after, and -
 because the site and the API then live under the *same* address, reached through Nginx - the browser never needs
-cross-origin permission (CORS) for the RSVP form to talk to the API. That one thing DOES need a one-line change:
-open `src/app/rsvp/rsvp.ts` and set `SAME_ORIGIN = true` (it defaults to `false`, which asks for the API at its own
-port instead - correct for testing, and for the simpler VM setup below, but not for this same-address Nginx setup).
+cross-origin permission (CORS) for the RSVP form to talk to the API. Nothing to edit for that: `src/app/rsvp/rsvp.ts`
+notices that the page was opened without an explicit port (`https://your-names.example/`) and then asks for
+`/api/...` on the same address; with an explicit port (`ng serve`, the VM setup below) it asks for the API's own port.
 
 **Already have a VM instead, and just want it reachable at its own address and port, with no domain or Nginx?** That
-is simpler: keep `SAME_ORIGIN` as it is (`false`), build the site (`npm run build`), and either run
+is simpler: build the site (`npm run build`), and either run
 `npm run start:vm` (uses Angular's own server, quick, fine for a wedding site's traffic) or serve the built
 `dist/wedding-site/browser` folder with any static file server on whatever port you like — `npx serve dist/wedding-site/browser -l 4500`,
 for instance, needs nothing installed permanently. Start `server/` the same way as below (step 5) on the same VM,
@@ -61,15 +61,16 @@ mysql_secure_installation
 ```
 
 Answer its questions (set a root password, decline anonymous users, etc.), then copy `server/schema.sql` onto the
-server (see step 4 for how to get files there at all) and run it:
+server (see step 4 for how to get files there at all). Before running it, replace `CHANGE_ME_DB_PASSWORD` in it with
+a **new** password of your own for this server's copy of the database (the same value goes into `.env` in step 5),
+then run it:
 
 ```bash
 mysql -u root -p < schema.sql
 ```
 
-This creates the database and its own low-privilege `wedding_rsvp` user, exactly like it did locally - a **new**
-password for this server's copy of the database is inside the file, since it is the file that runs there, not the
-one on your computer.
+This creates the database, its own low-privilege `wedding_rsvp` user and the current menu, exactly like it did
+locally.
 
 ## 3. Build the site (on your own computer)
 
@@ -103,7 +104,7 @@ scp server/schema.sql root@<server IP>:~
 cd /opt/wedding-rsvp
 npm install --omit=dev
 cp .env.example .env
-nano .env   # put in the password schema.sql printed for THIS server, and set NODE_ENV=production
+nano .env   # put in the password you chose in schema.sql for THIS server, and add NODE_ENV=production
 pm2 start index.js --name wedding-rsvp
 pm2 save
 pm2 startup   # then run the one command it prints, so it also survives a reboot

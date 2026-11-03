@@ -17,10 +17,12 @@ const MENU_TIMEOUT_MS = 8000;
  * moved to a different port.
  *
  * If `server/` is instead put behind a reverse proxy under the SAME address as the site (Nginx forwarding `/api/...`
- * to the API process, as in `DEPLOY.md`'s guide), set `SAME_ORIGIN` to `true`: the form will then use a plain
- * `/api/...` path with no host or port of its own, and let the proxy sort out where it actually goes.
+ * to the API process, as in `DEPLOY.md`'s guide), the form uses a plain `/api/...` path with no host or port of its
+ * own, and lets the proxy sort out where it actually goes. That is detected by the page's port: a site opened at
+ * `https://domain/` or `http://domain/` has no explicit port (`location.port` is empty), while every setup with the
+ * API on its own port (`ng serve` on 4300, the VM on 4500, ...) has one.
  */
-const SAME_ORIGIN = false;
+const SAME_ORIGIN = location.port === '';
 const API_PORT = 3010;
 const API_BASE = SAME_ORIGIN ? '' : `${location.protocol}//${location.hostname}:${API_PORT}`;
 
